@@ -1,5 +1,6 @@
 /* 设置整个页面的背景图 */
 body {
+    background-color: #4c6066;      /* 背景图加载前的底色，避免白屏突兀 */
     background-image: url('/images/bg.webp');
     background-size: cover;          /* 让图片铺满屏幕 */
     background-attachment: fixed;    /* 滚动时背景固定不动 */
@@ -18,4 +19,12 @@ body {
 .navbar,
 .footer {
     background-color: rgba(255, 255, 255, 0.45);
+}
+
+/* 导航菜单 hover/选中时保持半透明，覆盖 Bulma 默认的不透明白色块 */
+.navbar a.navbar-item:hover,
+.navbar a.navbar-item.is-active,
+.navbar .navbar-link:hover,
+.navbar .navbar-link.is-active {
+    background-color: rgba(255, 255, 255, 0.5);
 }
