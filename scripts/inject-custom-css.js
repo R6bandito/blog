@@ -6,6 +6,16 @@ hexo.extend.injector.register('head_end', '<link rel="stylesheet" href="/css/cus
 // 提前预加载背景图，缩短整页加载时的白屏时间
 hexo.extend.injector.register('head_begin', '<link rel="preload" as="image" href="/images/bg.webp">');
 
+// 禁用 MoOx Pjax（其 301 重定向场景静默失效导致整页刷新），由自研 pjax-custom.js 接管
+hexo.extend.injector.register('head_begin', '<script>window.Pjax = function () {}; document.addEventListener(\'DOMContentLoaded\', function () { window.Pjax = function () {}; });</script>');
+
+// 自研轻量 PJAX（fetch + DOMParser，自动跟随重定向，只替换内容区）
+hexo.extend.injector.register('body_end', '<script src="/js/pjax-custom.js"></script>');
+
+// 防止 PJAX 切页时替换 head 中的样式链接导致布局瞬间塌陷（闪烁）
+// 只摘掉 head 里 link 的 data-pjax 属性，body 中脚本的 data-pjax 保留
+hexo.extend.injector.register('head_begin', '<script>document.addEventListener(\'DOMContentLoaded\', function () { document.querySelectorAll(\'head [data-pjax]\').forEach(function (el) { el.removeAttribute(\'data-pjax\'); }); });</script>');
+
 // 背景音乐：原生 audio 实现，音符按钮 = 播放/暂停，控制条可收起（收起后音乐继续）
 // 音频文件放 source/music/ 目录（01-07.mp3）
 hexo.extend.injector.register('body_end', [
