@@ -12,6 +12,9 @@ hexo.extend.injector.register('head_begin', '<script>window.Pjax = function () {
 // 自研轻量 PJAX（fetch + DOMParser，自动跟随重定向，只替换内容区）
 hexo.extend.injector.register('body_end', '<script src="/js/pjax-custom.js"></script>');
 
+// 背景图轮换脚本
+hexo.extend.injector.register('body_end', '<script src="/js/bg-slideshow.js"></script>');
+
 // 防止 PJAX 切页时替换 head 中的样式链接导致布局瞬间塌陷（闪烁）
 // 只摘掉 head 里 link 的 data-pjax 属性，body 中脚本的 data-pjax 保留
 hexo.extend.injector.register('head_begin', '<script>document.addEventListener(\'DOMContentLoaded\', function () { document.querySelectorAll(\'head [data-pjax]\').forEach(function (el) { el.removeAttribute(\'data-pjax\'); }); });</script>');

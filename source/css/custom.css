@@ -128,3 +128,22 @@ figure.highlight::-webkit-scrollbar-track {
     text-overflow: ellipsis;
     max-width: 130px;
 }
+
+/* 背景图轮换层：双层叠层 + opacity 渐变切换 */
+.bg-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+    pointer-events: none;
+}
+
+.bg-layer.active {
+    opacity: 1;
+}
