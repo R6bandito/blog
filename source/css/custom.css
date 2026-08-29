@@ -1,0 +1,21 @@
+/* 设置整个页面的背景图 */
+body {
+    background-image: url('/images/bg.png');
+    background-size: cover;          /* 让图片铺满屏幕 */
+    background-attachment: fixed;    /* 滚动时背景固定不动 */
+    background-position: center;     /* 居中显示 */
+}
+
+/* 让文章卡片背景变得半透明 */
+.card,
+.card-content,
+.box,
+.section {
+    background-color: rgba(255, 255, 255, 0.35); /* 白色背景，透明度85% */
+}
+
+/* 导航栏和页脚也可以稍微透明 */
+.navbar,
+.footer {
+    background-color: rgba(255, 255, 255, 0.45);
+}

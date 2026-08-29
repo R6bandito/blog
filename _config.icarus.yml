@@ -39,7 +39,7 @@ head:
     open_graph:
         # Page title (og:title) (optional)
         # You should leave this blank for most of the time
-        title: 
+        title: R6bandito 的嵌入式笔记
         # Page type (og:type) (optional)
         # You should leave this blank for most of the time
         type: blog
@@ -105,20 +105,20 @@ head:
 navbar:
     # Navigation menu items
     menu:
-        Home: /
-        Archives: /archives
-        #Categories: /categories
-        Tags: /tags
+        主页: /
+        所有文章: /archives
+        分类: /categories
+        #Tags: /tags
         #About: /about
     # Links to be shown on the right of the navigation bar
     links:
         Download on GitHub:
             icon: fab fa-github
-            url: https://github.com/ppoffice/hexo-theme-icarus
+            url: https://github.com/R6bandito
 # Page footer configurations
 footer:
     # Copyright text
-    copyright: © 2019
+    copyright: © 2026
     # Links to be shown on the right of the footer section
     links:
         Creative Commons:
@@ -129,7 +129,7 @@ footer:
             url: https://creativecommons.org/licenses/by/4.0/
         Download on GitHub:
             icon: fab fa-github
-            url: https://github.com/ppoffice/hexo-theme-icarus
+            url: https://github.com/R6bandito
 # Article related configurations
 article:
     # Code highlight settings
@@ -164,51 +164,51 @@ search:
     index_pages: true
 # Comment plugin configurations
 # https://ppoffice.github.io/hexo-theme-icarus/categories/Plugins/Comment/
-comment:
-    type: disqus
+#comment:
+    #type: disqus
     # Disqus shortname
-    shortname: ''
+    #shortname: ''
 # Donate plugin configurations
 # https://ppoffice.github.io/hexo-theme-icarus/categories/Plugins/Donation/
-donates:
+#donates:
     # "Afdian.net" donate button configurations
-    -
-        type: afdian
+    #-
+        #type: afdian
         # URL to the "Afdian.net" personal page
-        url: ''
+        #url: ''
     # Alipay donate button configurations
-    -
-        type: alipay
+    #-
+        #type: alipay
         # Alipay qrcode image URL
-        qrcode: ''
+        #qrcode: ''
     # "Buy me a coffee" donate button configurations
-    -
-        type: buymeacoffee
+    #-
+        #type: buymeacoffee
         # URL to the "Buy me a coffee" page
-        url: ''
+        #url: ''
     # Patreon donate button configurations
-    -
-        type: patreon
+    #-
+        #type: patreon
         # URL to the Patreon page
-        url: ''
+        #url: ''
     # Paypal donate button configurations
-    -
-        type: paypal
+    #-
+        #type: paypal
         # Paypal business ID or email address
-        business: ''
+        #business: ''
         # Currency code
-        currency_code: USD
+        #currency_code: USD
     # Wechat donate button configurations
-    -
-        type: wechat
+    #-
+        #type: wechat
         # Wechat qrcode image URL
-        qrcode: ''
+        #qrcode: ''
 # Share plugin configurations
 # https://ppoffice.github.io/hexo-theme-icarus/categories/Plugins/Share/
-share:
-    type: sharethis
+#share:
+    #type: sharethis
     # URL to the ShareThis share plugin script
-    install_url: ''
+    #install_url: ''
 # Sidebar configurations.
 # Please be noted that a sidebar is only visible when it has at least one widget
 sidebar:
@@ -235,30 +235,30 @@ widgets:
         # Author's current location
         location: 南京
         # URL or path to the avatar image
-        avatar: 
+        avatar: /images/avatar.png
         # Whether show the rounded avatar image
         avatar_rounded: false
         # Email address for the Gravatar
         gravatar: 
         # URL or path for the follow button
-        follow_link: https://github.com/ppoffice
+        follow_link: https://github.com/R6bandito
         # Links to be shown on the bottom of the profile widget
         social_links:
             Github:
                 icon: fab fa-github
                 url: https://github.com/R6bandito
-            Facebook:
-                icon: fab fa-facebook
-                url: https://facebook.com
-            Twitter:
-                icon: fab fa-twitter
-                url: https://twitter.com
-            Dribbble:
-                icon: fab fa-dribbble
-                url: https://dribbble.com
-            RSS:
-                icon: fas fa-rss
-                url: /
+            # Facebook:
+                # icon: fab fa-facebook
+                # url: https://facebook.com
+            # Twitter:
+                # icon: fab fa-twitter
+                # url: https://twitter.com
+            # Dribbble:
+                # icon: fab fa-dribbble
+                # url: https://dribbble.com
+            # RSS:
+                # icon: fas fa-rss
+                # url: /
     # Table of contents widget configurations
     -
         # Where should the widget be placed, left sidebar or right sidebar
@@ -271,14 +271,14 @@ widgets:
         # Maximum level of headings to show (1-6)
         depth: 3
     # Recommendation links widget configurations
-    -
+    # -
         # Where should the widget be placed, left sidebar or right sidebar
-        position: left
-        type: links
+        # position: left
+        # type: links
         # Names and URLs of the sites
-        links:
-            Hexo: https://hexo.io
-            Bulma: https://bulma.io
+        # links:
+            # Hexo: https://hexo.io
+            # Bulma: https://bulma.io
     # Categories widget configurations
     -
         # Where should the widget be placed, left sidebar or right sidebar
@@ -306,34 +306,34 @@ widgets:
         # Whether to show tags count, i.e. number of posts in the tag.
         show_count: true
     # Google FeedBurner email subscription widget configurations
-    -
+    # -
         # Where should the widget be placed, left sidebar or right sidebar
-        position: left
-        type: subscribe_email
+        # position: left
+        # type: subscribe_email
         # Hint text under the email input
-        description: 
+        # description: 
         # Feedburner ID
-        feedburner_id: ''
+        # feedburner_id: ''
     # Google AdSense unit configurations
-    -
+    # -
         # Where should the widget be placed, left sidebar or right sidebar
-        position: left
-        type: adsense
+        # position: left
+        # type: adsense
         # AdSense client ID
-        client_id: ''
+        # client_id: ''
         # AdSense AD unit ID
-        slot_id: ''
+        # slot_id: ''
     # Follow.it email subscription widget configurations
-    -
+    # -
         # Where should the widget be placed, left sidebar or right sidebar
-        position: left
-        type: followit
+        # position: left
+        # type: followit
         # Hint text under the email input
-        description: 
+        # description: 
         # Subscription form action URL
-        action_url: ''
+        # action_url: ''
         # Feed claiming verification code
-        verification_code: ''
+        # verification_code: ''
 # Plugin configurations
 # https://ppoffice.github.io/hexo-theme-icarus/categories/Plugins/
 plugins:
@@ -363,17 +363,17 @@ plugins:
         web_id: 
     # Alerting users about the use of cookies
     # https://www.osano.com/cookieconsent/
-    cookie_consent:
+    # cookie_consent:
         # The compliance type. Can be "info", "opt-in", or "opt-out"
-        type: info
+        # type: info
         # Theme of the popup. Can be "block", "edgeless", or "classic"
-        theme: edgeless
+        # theme: edgeless
         # Whether the popup should stay static regardless of the page scrolls
-        static: false
+        # static: false
         # Where on the screen the consent popup should display
-        position: bottom-left
+        # position: bottom-left
         # URL to your site's cookie policy
-        policyLink: https://www.cookiesandyou.com/
+        # policyLink: https://www.cookiesandyou.com/
     # Enable the lightGallery and Justified Gallery plugins
     gallery: true
     # Google Analytics plugin settings
