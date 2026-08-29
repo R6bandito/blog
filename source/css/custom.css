@@ -1,6 +1,6 @@
 /* 设置整个页面的背景图 */
 body {
-    background-image: url('/images/bg.png');
+    background-image: url('/images/bg.webp');
     background-size: cover;          /* 让图片铺满屏幕 */
     background-attachment: fixed;    /* 滚动时背景固定不动 */
     background-position: center;     /* 居中显示 */
