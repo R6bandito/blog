@@ -8,11 +8,15 @@
     var rootScripts = ['/js/main.js', '/js/toc.js', '/js/column.js'];
 
     document.addEventListener('click', function (e) {
+        // 其他组件已处理的事件（如图片灯箱 lightGallery）不再介入
+        if (e.defaultPrevented) { return; }
         var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
         if (!a) { return; }
         if (a.target && a.target !== '_self') { return; }
         var href = a.getAttribute('href');
         if (!href || href.charAt(0) === '#') { return; }
+        // 资源文件（图片/音视频等）不拦截，交给浏览器或灯箱处理
+        if (/\.(png|jpe?g|webp|gif|svg|ico|mp3|webm|mp4|zip|pdf)(\?|$)/i.test(href)) { return; }
         // 仅拦截站内链接
         if (a.hostname !== location.hostname || a.protocol !== location.protocol) { return; }
         e.preventDefault();

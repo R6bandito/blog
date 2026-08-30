@@ -198,3 +198,10 @@ body.is-list-page .article .content,
 body.is-list-page .article .article-more {
     display: none;
 }
+
+/* 文章正文图片居中（含 Typora 缩放后的图） */
+.article .content img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}

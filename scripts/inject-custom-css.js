@@ -3,6 +3,9 @@
 // Hexo 8 已移除 _config.yml 中的 inject 配置支持，故使用 injector API
 hexo.extend.injector.register('head_end', '<link rel="stylesheet" href="/css/custom.css">');
 
+// 图片灯箱 lightGallery 本地化（CDN 不稳定，加载失败时点图片会跳转丢滚动位置）
+hexo.extend.injector.register('head_end', '<link rel="stylesheet" href="/css/lightgallery.min.css">');
+
 // 提前预加载背景图，缩短整页加载时的白屏时间
 hexo.extend.injector.register('head_begin', '<link rel="preload" as="image" href="/images/bg.webp">');
 
@@ -11,6 +14,10 @@ hexo.extend.injector.register('head_begin', '<script>window.Pjax = function () {
 
 // 自研轻量 PJAX（fetch + DOMParser，自动跟随重定向，只替换内容区）
 hexo.extend.injector.register('body_end', '<script src="/js/pjax-custom.js"></script>');
+
+// lightGallery 本地脚本 + 手动初始化（确保灯箱可用，点图不跳转）
+hexo.extend.injector.register('body_end', '<script src="/js/lightgallery.min.js"></script>');
+hexo.extend.injector.register('body_end', '<script>document.addEventListener(\'DOMContentLoaded\', function () { if (window.jQuery && jQuery.fn.lightGallery) { jQuery(\'.article\').lightGallery({ selector: \'.gallery-item\' }); } });</script>');
 
 // 背景图轮换脚本
 hexo.extend.injector.register('body_end', '<script src="/js/bg-slideshow.js"></script>');
