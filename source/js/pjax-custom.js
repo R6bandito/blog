@@ -42,7 +42,7 @@
                 if (newNe && oldNe) { oldNe.innerHTML = newNe.innerHTML; }
                 // 更新 URL 并回顶
                 history.pushState(null, '', url);
-                window.scrollTo(0, 0);
+                var sc = document.querySelector('.column-main'); if (sc) { sc.scrollTop = 0; } else { window.scrollTo(0, 0); }
                 // 重新初始化内容组件（图片包装、代码块、目录等）
                 rootScripts.forEach(function (s) {
                     var el = document.createElement('script');

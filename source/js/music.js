@@ -25,7 +25,9 @@
         { name: 'フライングゲット', url: '/music/01-flying-get.mp3' },
         { name: 'ヘビーローテーション', url: '/music/02-heavy-rotation.mp3' },
         { name: 'ポニーテールとシュシュ', url: '/music/04-ponytail-shushu.mp3' },
-        { name: '風は吹いている', url: '/music/05-kaze-wa-fuiteiru.mp3' }
+        { name: '風は吹いている', url: '/music/05-kaze-wa-fuiteiru.mp3' },
+        { name: 'RIVER', url: '/music/08-river.mp3' },
+        { name: '結晶', url: '/music/09-kesshou.mp3' }
     ];
 
     var btn = document.getElementById('music-toggle');

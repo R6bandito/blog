@@ -147,3 +147,48 @@ figure.highlight::-webkit-scrollbar-track {
 .bg-layer.active {
     opacity: 1;
 }
+
+/* 桌面端：独立滚动布局（文章区独立滚动，侧边栏与页脚正常显示） */
+@media screen and (min-width: 769px) {
+    html, body {
+        height: 100%;
+        overflow: hidden;
+    }
+    body {
+        display: flex;
+        flex-direction: column;
+    }
+    .navbar {
+        flex-shrink: 0;
+    }
+    .section {
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+        padding: 0.75rem 1.5rem;
+    }
+    .section > .container,
+    .columns {
+        height: 100%;
+    }
+    .column-main {
+        height: 100%;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+    }
+    .column-left {
+        height: 100%;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: none;      /* 可滚动但不显示滚动条 */
+    }
+    .column-left::-webkit-scrollbar {
+        display: none;
+    }
+    .footer {
+        flex-shrink: 0;
+        padding: 0.4rem 1rem;      /* 常驻底部，进一步压缩高度 */
+    }
+}
+}

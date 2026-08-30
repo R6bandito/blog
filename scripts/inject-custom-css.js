@@ -15,6 +15,10 @@ hexo.extend.injector.register('body_end', '<script src="/js/pjax-custom.js"></sc
 // 背景图轮换脚本
 hexo.extend.injector.register('body_end', '<script src="/js/bg-slideshow.js"></script>');
 
+// 回到顶部适配：独立滚动布局下监听滚动容器
+hexo.extend.injector.register('body_end', '<script>(function () { var btn = document.getElementById(\'back-to-top\'); if (!btn) return; var scrollers = Array.prototype.slice.call(document.querySelectorAll(\'.column-main, .column-left, .column-right\')); function onScroll() { var show = scrollers.some(function (s) { return s.scrollTop > 200; }); if (show) { btn.classList.add(\'is-active\'); } else { btn.classList.remove(\'is-active\'); } } scrollers.forEach(function (s) { s.addEventListener(\'scroll\', onScroll); }); btn.addEventListener(\'click\', function () { scrollers.forEach(function (s) { s.scrollTop = 0; }); }); })();</script>');
+
+
 // 防止 PJAX 切页时替换 head 中的样式链接导致布局瞬间塌陷（闪烁）
 // 只摘掉 head 里 link 的 data-pjax 属性，body 中脚本的 data-pjax 保留
 hexo.extend.injector.register('head_begin', '<script>document.addEventListener(\'DOMContentLoaded\', function () { document.querySelectorAll(\'head [data-pjax]\').forEach(function (el) { el.removeAttribute(\'data-pjax\'); }); });</script>');
