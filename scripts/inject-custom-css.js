@@ -22,6 +22,8 @@ hexo.extend.injector.register('body_end', '<script>document.addEventListener(\'D
 // 背景图轮换脚本
 hexo.extend.injector.register('body_end', '<script src="/js/bg-slideshow.js"></script>');
 
+hexo.extend.injector.register('body_end', '<script>(function () { var PALETTE = [[\'#ff6fb3\',\'#fff\'],[\'#26c6da\',\'#fff\'],[\'#ffa726\',\'#fff\'],[\'#66bb6a\',\'#fff\'],[\'#ab47bc\',\'#fff\'],[\'#ec407a\',\'#fff\'],[\'#ffca28\',\'#333\'],[\'#ef5350\',\'#fff\'],[\'#26a69a\',\'#fff\'],[\'#5c6bc0\',\'#fff\'],[\'#8d6e63\',\'#fff\'],[\'#ff8a65\',\'#fff\']]; function paint() { var els = document.querySelectorAll(\'.article-tags .tag, .tags.has-addons .tag\'); console.log(\'[diag] 标签配色: 找到 \' + els.length + \' 个\'); els.forEach(function (t) { var key = t.textContent.trim(); if (/^\\d+$/.test(key)) { t.style.backgroundColor = \'#fff\'; t.style.color = \'#7a7a7a\'; t.style.borderColor = \'#fff\'; return; } var h = 0; for (var i = 0; i < key.length; i++) { h = (h * 31 + key.charCodeAt(i)) >>> 0; } var c = PALETTE[h % PALETTE.length]; t.style.backgroundColor = c[0]; t.style.color = c[1]; t.style.borderColor = c[0]; }); } paint(); document.addEventListener(\'pjax:complete\', paint); })();</script>');
+
 // 分类/标签页标记：列表页只显示标题（隐藏正文）
 hexo.extend.injector.register('body_end', '<script>(function () { function hideContents() { var p = location.pathname; var isList = (p.indexOf(\'/categories/\') === 0 && p !== \'/categories/\') || (p.indexOf(\'/tags/\') === 0 && p !== \'/tags/\'); document.querySelectorAll(\'.article .content, .article .article-more\').forEach(function (el) { el.style.display = isList ? \'none\' : \'\'; }); } hideContents(); document.addEventListener(\'pjax:complete\', hideContents); })();</script>');
 
