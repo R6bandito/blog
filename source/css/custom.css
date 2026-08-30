@@ -192,3 +192,9 @@ figure.highlight::-webkit-scrollbar-track {
     }
 }
 }
+
+/* 分类/标签列表页：只显示文章标题，隐藏正文 */
+body.is-list-page .article .content,
+body.is-list-page .article .article-more {
+    display: none;
+}

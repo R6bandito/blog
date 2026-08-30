@@ -49,6 +49,12 @@
                     el.src = s;
                     document.body.appendChild(el);
                 });
+                // 列表页（分类/标签）隐藏文章正文，只显示标题
+                var p = location.pathname;
+                var isList = (p.indexOf('/categories/') === 0 && p !== '/categories/') || (p.indexOf('/tags/') === 0 && p !== '/tags/');
+                document.querySelectorAll('.article .content, .article .article-more').forEach(function (el) {
+                    el.style.display = isList ? 'none' : '';
+                });
                 // 通知其他模块（音乐恢复等）
                 document.dispatchEvent(new Event('pjax:complete'));
             })

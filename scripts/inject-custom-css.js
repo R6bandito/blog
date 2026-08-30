@@ -15,6 +15,10 @@ hexo.extend.injector.register('body_end', '<script src="/js/pjax-custom.js"></sc
 // 背景图轮换脚本
 hexo.extend.injector.register('body_end', '<script src="/js/bg-slideshow.js"></script>');
 
+// 分类/标签页标记：列表页只显示标题（隐藏正文）
+hexo.extend.injector.register('body_end', '<script>(function () { function hideContents() { var p = location.pathname; var isList = (p.indexOf(\'/categories/\') === 0 && p !== \'/categories/\') || (p.indexOf(\'/tags/\') === 0 && p !== \'/tags/\'); document.querySelectorAll(\'.article .content, .article .article-more\').forEach(function (el) { el.style.display = isList ? \'none\' : \'\'; }); } hideContents(); document.addEventListener(\'pjax:complete\', hideContents); })();</script>');
+
+
 // 回到顶部适配：独立滚动布局下监听滚动容器
 hexo.extend.injector.register('body_end', '<script>(function () { var btn = document.getElementById(\'back-to-top\'); if (!btn) return; var scrollers = Array.prototype.slice.call(document.querySelectorAll(\'.column-main, .column-left, .column-right\')); function onScroll() { var show = scrollers.some(function (s) { return s.scrollTop > 200; }); if (show) { btn.classList.add(\'is-active\'); } else { btn.classList.remove(\'is-active\'); } } scrollers.forEach(function (s) { s.addEventListener(\'scroll\', onScroll); }); btn.addEventListener(\'click\', function () { scrollers.forEach(function (s) { s.scrollTop = 0; }); }); })();</script>');
 
