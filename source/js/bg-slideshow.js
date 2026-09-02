@@ -1,7 +1,7 @@
 // 背景图轮换：直接操作 body 背景 + 透明度渐变过渡
 // 图片放 source/images/，在 images 数组里添加路径
 (function () {
-    var images = ['/images/bg.webp', '/images/bg2.webp', '/images/bg3.webp', '/images/bg4.webp', '/images/bg5.webp'];
+    var images = ['/images/bg.webp', '/images/bg2.webp', '/images/bg3.webp', '/images/bg4.webp', '/images/bg5.webp', '/images/bg6.webp', '/images/bg7.webp', '/images/bg8.webp'];
     var body = document.body;
     var idx = 0;
     var switching = false;
