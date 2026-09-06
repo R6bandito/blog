@@ -19,6 +19,7 @@
     }
 
     var songs = [
+        { name: '僕たちは戦わない', url: '/music/10-bokutachi-wa-tatakawanai.mp3' },
         { name: '初日', url: '/music/07-hatsuhi.mp3' },
         { name: '恋するフォーチュンクッキー', url: '/music/06-koisuru-fortune-cookie.mp3' },
         { name: '名残り桜', url: '/music/03-nagori-zakura.mp3' },
@@ -27,7 +28,8 @@
         { name: 'ポニーテールとシュシュ', url: '/music/04-ponytail-shushu.mp3' },
         { name: '風は吹いている', url: '/music/05-kaze-wa-fuiteiru.mp3' },
         { name: 'RIVER', url: '/music/08-river.mp3' },
-        { name: '結晶', url: '/music/09-kesshou.mp3' }
+        { name: '結晶', url: '/music/09-kesshou.mp3' },
+        { name: 'ナギイチ', url: '/music/11-nagiichi.mp3' }
     ];
 
     var btn = document.getElementById('music-toggle');
