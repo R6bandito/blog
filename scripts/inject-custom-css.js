@@ -3,6 +3,9 @@
 // Hexo 8 已移除 _config.yml 中的 inject 配置支持，故使用 injector API
 hexo.extend.injector.register('head_end', '<link rel="stylesheet" href="/css/custom.css">');
 
+// 导航栏站点名文字
+hexo.extend.injector.register('head_end', '<style>.nav-site-title { font-size: 1.05rem; font-weight: 600; margin-left: 8px; color: #5c4a56; letter-spacing: 0.5px; } @media (max-width: 768px) { .nav-site-title { display: none; } }</style>');
+
 // 图片灯箱 lightGallery 本地化（CDN 不稳定，加载失败时点图片会跳转丢滚动位置）
 hexo.extend.injector.register('head_end', '<link rel="stylesheet" href="/css/lightgallery.min.css">');
 
@@ -14,6 +17,9 @@ hexo.extend.injector.register('head_begin', '<script>window.Pjax = function () {
 
 // 自研轻量 PJAX（fetch + DOMParser，自动跟随重定向，只替换内容区）
 hexo.extend.injector.register('body_end', '<script src="/js/pjax-custom.js"></script>');
+
+// 导航栏站点名（樱花 logo 旁）
+hexo.extend.injector.register('body_end', '<script>(function () { var logo = document.querySelector(\'.navbar-logo\'); if (!logo || logo.querySelector(\'.nav-site-title\')) { return; } var span = document.createElement(\'span\'); span.className = \'nav-site-title\'; span.textContent = \'R6bandito 的笔记\'; logo.appendChild(span); })();</script>');
 
 // 搜索结果跳转补丁：insight.js 用 location.href 整页跳转（导致背景/音乐重置），拦截改走 PJAX
 hexo.extend.injector.register('body_end', '<script>(function () { document.addEventListener(\'click\', function (e) { var item = e.target && e.target.closest ? e.target.closest(\'.searchbox-result-item\') : null; if (!item) { return; } var href = item.getAttribute(\'href\'); if (!href) { return; } e.preventDefault(); e.stopPropagation(); var box = document.querySelector(\'.searchbox\'); if (box) { box.classList.remove(\'show\'); } var nav = document.querySelector(\'.navbar-main\'); if (nav) { nav.style.pointerEvents = \'none\'; setTimeout(function () { nav.style.pointerEvents = \'auto\'; }, 400); } if (window.__pjaxNavigate) { window.__pjaxNavigate(href); } else { location.href = href; } }, true); })();</script>');

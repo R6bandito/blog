@@ -205,3 +205,12 @@ body.is-list-page .article .article-more {
     margin-left: auto;
     margin-right: auto;
 }
+
+/* PJAX 切换淡入过渡 */
+.columns.pjax-swap {
+    animation: pjaxFadeIn 0.3s ease;
+}
+@keyframes pjaxFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+}

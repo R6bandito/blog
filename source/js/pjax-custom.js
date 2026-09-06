@@ -36,7 +36,13 @@
                 // 替换主内容区
                 var newCols = doc.querySelector('.columns');
                 var oldCols = document.querySelector('.columns');
-                if (newCols && oldCols) { oldCols.innerHTML = newCols.innerHTML; }
+                if (newCols && oldCols) {
+                    oldCols.innerHTML = newCols.innerHTML;
+                    // 淡入过渡：移除类 → 强制 reflow → 重新添加触发动画
+                    oldCols.classList.remove('pjax-swap');
+                    void oldCols.offsetWidth;
+                    oldCols.classList.add('pjax-swap');
+                }
                 // 替换导航菜单（当前选中态）
                 var newNs = doc.querySelector('.navbar-start');
                 var oldNs = document.querySelector('.navbar-start');
