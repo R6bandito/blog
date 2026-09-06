@@ -66,4 +66,7 @@
                 window.location = url;   // 请求失败则整页跳转兜底
             });
     }
+
+    // 暴露给其他模块（如搜索结果跳转）使用
+    window.__pjaxNavigate = navigate;
 })();

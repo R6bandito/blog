@@ -15,6 +15,9 @@ hexo.extend.injector.register('head_begin', '<script>window.Pjax = function () {
 // 自研轻量 PJAX（fetch + DOMParser，自动跟随重定向，只替换内容区）
 hexo.extend.injector.register('body_end', '<script src="/js/pjax-custom.js"></script>');
 
+// 搜索结果跳转补丁：insight.js 用 location.href 整页跳转（导致背景/音乐重置），拦截改走 PJAX
+hexo.extend.injector.register('body_end', '<script>(function () { document.addEventListener(\'click\', function (e) { var item = e.target && e.target.closest ? e.target.closest(\'.searchbox-result-item\') : null; if (!item) { return; } var href = item.getAttribute(\'href\'); if (!href) { return; } e.preventDefault(); e.stopPropagation(); var box = document.querySelector(\'.searchbox\'); if (box) { box.classList.remove(\'show\'); } var nav = document.querySelector(\'.navbar-main\'); if (nav) { nav.style.pointerEvents = \'none\'; setTimeout(function () { nav.style.pointerEvents = \'auto\'; }, 400); } if (window.__pjaxNavigate) { window.__pjaxNavigate(href); } else { location.href = href; } }, true); })();</script>');
+
 // lightGallery 本地脚本 + 手动初始化（确保灯箱可用，点图不跳转）
 hexo.extend.injector.register('body_end', '<script src="/js/lightgallery.min.js"></script>');
 hexo.extend.injector.register('body_end', '<script>document.addEventListener(\'DOMContentLoaded\', function () { if (window.jQuery && jQuery.fn.lightGallery) { jQuery(\'.article\').lightGallery({ selector: \'.gallery-item\' }); } });</script>');
