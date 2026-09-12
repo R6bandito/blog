@@ -240,3 +240,137 @@ body.is-list-page .article .article-more {
 code, pre, kbd, samp, .hljs, .article .content code, .article .content pre {
     font-family: 'JetBrains Mono', Consolas, 'Courier New', 'Microsoft YaHei', monospace;
 }
+
+/* ==================== 标题字体：得意黑 ==================== */
+@font-face {
+    font-family: 'Smiley Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/fonts/smiley-sans-subset.woff2') format('woff2');
+}
+.article h1, .article h2, .article h3, .article h4, .article h5, .article h6,
+.article-title, .card-header-title, .navbar-item, .menu-label, .title, .subtitle,
+.widget .menu-label, .breadcrumb, .pagination-link, .tag,
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Smiley Sans', 'PingFang SC', 'HarmonyOS Sans SC', 'Microsoft YaHei', sans-serif !important;
+}
+
+/* ==================== 正文排版优化 ==================== */
+.article .content {
+    font-family: 'PingFang SC', 'HarmonyOS Sans SC', 'Microsoft YaHei', -apple-system, 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.9;
+    color: #2f3542;
+    letter-spacing: 0.02em;
+}
+.article .content p {
+    margin-bottom: 1.2em;
+}
+.article .content strong {
+    color: #3a3a3a;
+    font-weight: 600;
+}
+.article .content a {
+    color: #e0568a;
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(224, 86, 138, 0.45);
+    transition: border-color 0.2s, color 0.2s;
+}
+.article .content a:hover {
+    color: #ff6fb3;
+    border-bottom-color: #ff6fb3;
+    border-bottom-style: solid;
+}
+
+/* 标题层级装饰：粉色竖条 + 间距 */
+.article .content h2 {
+    position: relative;
+    padding-left: 14px;
+    margin-top: 1.8em;
+    margin-bottom: 0.9em;
+    border-left: 4px solid #ff9acb;
+    line-height: 1.4;
+}
+.article .content h3 {
+    position: relative;
+    padding-left: 12px;
+    margin-top: 1.5em;
+    margin-bottom: 0.7em;
+    border-left: 3px solid #ffc2dd;
+    line-height: 1.4;
+}
+.article .content h4 {
+    margin-top: 1.3em;
+    margin-bottom: 0.6em;
+    color: #d94a86;
+}
+
+/* 引用块：柔和粉底 */
+.article .content blockquote {
+    border-left: 4px solid #ffc2dd;
+    background: rgba(255, 182, 213, 0.09);
+    border-radius: 0 8px 8px 0;
+    padding: 0.5em 1em;
+    color: #5a5a5a;
+}
+
+/* 图片圆角与留白 */
+.article .content img {
+    border-radius: 10px;
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.08);
+}
+
+/* 行内代码与代码块 */
+.article .content code:not([class]) {
+    background: rgba(255, 154, 203, 0.14);
+    color: #c0396e;
+    padding: 0.15em 0.4em;
+    border-radius: 5px;
+}
+
+/* 表格美化 */
+.article .content table th {
+    background: rgba(255, 154, 203, 0.12);
+}
+.article .content table tr:hover {
+    background: rgba(255, 154, 203, 0.06);
+}
+
+/* ==================== 标题字号微调（+约10%） ==================== */
+.article .content h2 {
+    font-size: 1.9em;
+}
+.article .content h3 {
+    font-size: 1.62em;
+}
+.article .content h4 {
+    font-size: 1.35em;
+}
+.article-title {
+    font-size: 2.15rem;
+    line-height: 1.35;
+}
+h1.title, h2.title, h3.title {
+    font-size: 2rem;
+}
+/* 首页卡片标题 */
+.card-header-title {
+    font-size: 1.5rem;
+}
+/* 小屏保持比例 */
+@media (max-width: 768px) {
+    .article .content h2 { font-size: 1.6em; }
+    .article .content h3 { font-size: 1.4em; }
+    .article-title { font-size: 1.75rem; }
+}
+
+/* ==================== 分割线（md 的 ---） ==================== */
+.article .content hr {
+    height: 3px;
+    border: none;
+    background: linear-gradient(90deg, transparent 0%, #ffc2dd 15%, #ff8fc0 50%, #ffc2dd 85%, transparent 100%);
+    border-radius: 3px;
+    margin: 2.4em 0;
+    opacity: 0.9;
+}
