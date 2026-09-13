@@ -13,7 +13,7 @@ hexo.extend.injector.register('head_end', '<link rel="stylesheet" href="/css/lig
 hexo.extend.injector.register('head_end', '<link rel="stylesheet" href="/css/atom-one-dark.css">');
 
 // 提前预加载背景图，缩短整页加载时的白屏时间
-hexo.extend.injector.register('head_begin', '<link rel="preload" as="image" href="/images/bg.webp">');
+hexo.extend.injector.register('head_begin', '<link rel="preload" as="image" href="/images/bg2.webp">');
 
 // 禁用 MoOx Pjax（其 301 重定向场景静默失效导致整页刷新），由自研 pjax-custom.js 接管
 hexo.extend.injector.register('head_begin', '<script>window.Pjax = function () {}; document.addEventListener(\'DOMContentLoaded\', function () { window.Pjax = function () {}; });</script>');

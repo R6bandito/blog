@@ -1,0 +1,6 @@
+# Netlify 响应头配置
+# 把 atom.xml 的 MIME 从 application/atom+xml 覆盖为 application/xml
+# 原因：Chromium 对 feed 专用 MIME 不应用 XSLT 样式表，改成通用 XML 后
+# 浏览器打开会渲染漂亮的订阅页；RSS 阅读器不受影响（都接受 application/xml）
+/atom.xml
+  Content-Type: application/xml

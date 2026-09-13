@@ -1,7 +1,7 @@
 // 背景图轮换：双图层交叉淡入（新图淡入盖住旧图，全程无灰底闪烁）
 // 图片放 source/images/，在 images 数组里添加路径
 (function () {
-    var images = ['/images/bg.webp', '/images/bg2.webp', '/images/bg3.webp', '/images/bg4.webp', '/images/bg5.webp', '/images/bg6.webp', '/images/bg7.webp', '/images/bg8.webp'];
+    var images = ['/images/bg2.webp', '/images/bg3.webp', '/images/bg4.webp', '/images/bg5.webp', '/images/bg6.webp', '/images/bg7.webp', '/images/bg8.webp'];
     var INTERVAL = 60000;   // 切换间隔 60 秒
     var FADE = 1200;        // 交叉淡入时长（ms）
 
