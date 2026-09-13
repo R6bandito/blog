@@ -374,3 +374,33 @@ h1.title, h2.title, h3.title {
     margin: 2.4em 0;
     opacity: 0.9;
 }
+
+/* ==================== 西文字体本地化（替代 Google Fonts） ==================== */
+@font-face {
+    font-family: 'Ubuntu';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/fonts/ubuntu-400.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Ubuntu';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('/fonts/ubuntu-400.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Source Code Pro';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/fonts/source-code-pro-400.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Source Code Pro';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('/fonts/source-code-pro-600.woff2') format('woff2');
+}
