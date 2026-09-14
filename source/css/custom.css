@@ -422,3 +422,27 @@ h1.title, h2.title, h3.title {
     position: relative;
     z-index: 1;
 }
+
+/* 手机小屏适配：音乐按钮/控制条 */
+@media (max-width: 480px) {
+    #music-toggle {
+        right: 14px;
+        bottom: 72px;
+        width: 40px;
+        height: 40px;
+    }
+    #music-bar {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        bottom: 120px;
+    }
+}
+
+/* 手机端背景图位置微调：默认图在竖屏下主体偏右，向左移动显示区域
+   仅限手机（≤768px），PC 端完全不受影响 */
+@media (max-width: 768px) {
+    .site-bg-layer {
+        background-position: 75% center !important;
+    }
+}

@@ -10,7 +10,7 @@
     function makeLayer() {
         var d = document.createElement('div');
         d.className = 'site-bg-layer';
-        d.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;' +
+        d.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100vh;height:100lvh;' +
             'background-size:cover;background-position:center;background-repeat:no-repeat;' +
             'opacity:0;transition:opacity ' + (FADE / 1000) + 's ease;pointer-events:none';
         return d;

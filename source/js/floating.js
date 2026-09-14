@@ -31,13 +31,13 @@
 
     // ==================== 上层 Canvas：花瓣 + 礼花 ====================
     var canvas = document.createElement('canvas');
-    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998';
+    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100vh;height:100lvh;pointer-events:none;z-index:9998';
     document.body.appendChild(canvas);
     var ctx = canvas.getContext('2d');
 
     // ==================== 下层 Canvas：微光点（z-index:-1） ====================
     var bCanvas = document.createElement('canvas');
-    bCanvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none';
+    bCanvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100vh;height:100lvh;pointer-events:none';
     document.body.insertBefore(bCanvas, document.body.firstChild);
     var bCtx = bCanvas.getContext('2d');
 
