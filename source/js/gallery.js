@@ -66,6 +66,7 @@
         imgs.forEach(function (src) {
             var c = document.createElement('div');
             c.className = 'gallery-cell';
+            c.setAttribute('data-src', src);   // 灯箱取图用（lightGallery 只认 href/data-src）
             var im = document.createElement('img');
             im.src = src;
             im.alt = '';
@@ -98,6 +99,7 @@
                 f.className = 'gallery-feature';
                 var fi = document.createElement('div');
                 fi.className = 'gallery-feature-image';
+                fi.setAttribute('data-src', imgs[0]);   // 灯箱取图用
                 var fim = document.createElement('img');
                 fim.src = imgs[0];
                 fim.alt = '置顶照片';

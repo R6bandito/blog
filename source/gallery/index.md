@@ -1,5 +1,5 @@
 ---
-title: 照片墙
+title: 日常
 layout: page
 comments: false
 ---

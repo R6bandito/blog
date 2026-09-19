@@ -67,26 +67,28 @@
         switchTo(group[gi]);
     }, INTERVAL);
 
-    // 探测夜间图可用性（连续编号，遇到第一张缺失就停止）
-    (function probeNight(i) {
-        if (i >= nightCandidates.length) {
-            if (nightImages.length && window.console && console.log) {
-                console.log('[bg] 夜间组可用 ' + nightImages.length + ' 张');
-                // 探测完成时若当前已是夜间模式，立刻切过去
-                if (document.documentElement.classList.contains('dark-mode')) { setMode('dark'); }
-            }
-            return;
+    // 探测夜间图可用性（连续编号，遇到第一张缺失就停止；用 fetch 探测避免控制台 404 噪音）
+    function finishProbe() {
+        if (nightImages.length && window.console && console.log) {
+            console.log('[bg] 夜间组可用 ' + nightImages.length + ' 张');
         }
-        var img = new Image();
-        img.onload = function () { nightImages.push(nightCandidates[i]); probeNight(i + 1); };
-        img.onerror = function () {
-            if (nightImages.length && window.console && console.log) {
-                console.log('[bg] 夜间组可用 ' + nightImages.length + ' 张');
-                if (document.documentElement.classList.contains('dark-mode')) { setMode('dark'); }
-            }
-        };
-        img.src = nightCandidates[i];
-    })(0);
+        if (document.documentElement.classList.contains('dark-mode')) { setMode('dark'); }
+    }
+    // 优先用 hexo 注入的清单（零请求零 404）；没有清单时回退为逐张探测
+    if (window.__nightImages && window.__nightImages.length) {
+        nightImages = window.__nightImages.slice();
+        finishProbe();
+    } else {
+        (function probeNight(i) {
+            if (i >= nightCandidates.length) { finishProbe(); return; }
+            fetch(nightCandidates[i], { method: 'HEAD' })
+                .then(function (r) {
+                    if (r.ok) { nightImages.push(nightCandidates[i]); probeNight(i + 1); }
+                    else { finishProbe(); }
+                })
+                .catch(function () { finishProbe(); });
+        })(0);
+    }
 
     // 对外接口：主题切换时调用
     function setMode(mode) {
