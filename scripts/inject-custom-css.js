@@ -73,3 +73,7 @@ hexo.extend.injector.register('body_end', [
 hexo.extend.injector.register('head_begin', "<script>(function(){try{var d=localStorage.getItem('r6blog-theme')==='dark';if(d){document.documentElement.classList.add('dark-mode')}}catch(e){}})();</script>");
 // 夜间模式：主脚本（切换按钮 + 状态管理 + 背景组联动）
 hexo.extend.injector.register('body_end', '<script src="/js/theme-toggle.js" defer></script>');
+
+// 照片墙：样式 + 交互脚本（全站注入，页面内自动识别，PJAX 兼容）
+hexo.extend.injector.register('head_end', '<link rel="stylesheet" href="/css/gallery.css">');
+hexo.extend.injector.register('body_end', '<script src="/js/gallery.js" defer></script>');

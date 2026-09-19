@@ -1,0 +1,431 @@
+/* ==================== 照片墙 ==================== */
+
+.gallery-page {
+    width: 100%;
+}
+
+/* 顶部工具栏（发布按钮） */
+.gallery-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 14px;
+}
+
+.gallery-publish-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #ff9acb, #ff6fb3);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 8px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 3px 12px rgba(255, 111, 179, 0.32);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.gallery-publish-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 16px rgba(255, 111, 179, 0.42);
+}
+
+.gallery-publish-btn:active {
+    transform: translateY(0);
+}
+
+/* ==================== 第一条：大图 + 文字 ==================== */
+.gallery-feature {
+    display: flex;
+    gap: 18px;
+    margin-bottom: 8px;
+    align-items: flex-start;
+}
+
+.gallery-feature-image {
+    flex: 0 0 62%;
+    max-width: 62%;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f2f2f2;
+}
+
+.gallery-feature-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    cursor: zoom-in;
+    transition: transform 0.35s ease;
+}
+
+.gallery-feature-image:hover img {
+    transform: scale(1.02);
+}
+
+.gallery-feature-text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.gallery-date {
+    font-size: 12.5px;
+    color: #b0a0aa;
+    font-family: Consolas, monospace;
+    margin-bottom: 8px;
+}
+
+.gallery-text {
+    font-size: 15px;
+    line-height: 1.85;
+    color: #4a4a4a;
+    word-break: break-word;
+}
+
+/* ==================== 九宫格网格 ==================== */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-top: 12px;
+}
+
+.gallery-cell {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f2f2f2;
+}
+
+.gallery-cell::before {
+    content: '';
+    display: block;
+    padding-bottom: 100%;   /* 1:1 正方形占位 */
+}
+
+.gallery-cell img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: zoom-in;
+    transition: transform 0.35s ease;
+}
+
+.gallery-cell:hover img {
+    transform: scale(1.05);
+}
+
+/* ==================== 发布面板 ==================== */
+.gallery-publish-panel {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(20, 22, 28, 0.5);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.gallery-publish-panel.open {
+    display: flex;
+}
+
+.gallery-panel-box {
+    width: 100%;
+    max-width: 520px;
+    max-height: 88vh;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.22);
+}
+
+.gallery-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f5e6ee;
+    font-weight: 600;
+    color: #d94a86;
+    font-size: 16px;
+}
+
+.gallery-panel-head a {
+    color: #bbb;
+    font-size: 22px;
+    line-height: 1;
+    text-decoration: none;
+}
+
+.gallery-panel-head a:hover {
+    color: #ff6fb3;
+}
+
+.gallery-panel-body {
+    padding: 18px 20px;
+}
+
+/* 上传区 */
+.gallery-upload-zone {
+    display: block;
+    border: 2px dashed #ffd0e6;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    background: #fffafc;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.gallery-upload-zone:hover {
+    border-color: #ff9acb;
+    background: #fff5fa;
+}
+
+.gallery-upload-zone.has-files {
+    padding: 12px;
+}
+
+.gallery-upload-hint i {
+    font-size: 26px;
+    color: #ff9acb;
+}
+
+.gallery-upload-hint p {
+    margin-top: 6px;
+    font-size: 13.5px;
+    color: #a893a0;
+}
+
+.gallery-upload-zone.has-files .gallery-upload-hint {
+    display: none;
+}
+
+.gallery-upload-preview {
+    display: none;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+
+.gallery-upload-zone.has-files .gallery-upload-preview {
+    display: grid;
+}
+
+.gallery-upload-preview .up-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    padding-bottom: 100%;
+    background: #f2f2f2;
+}
+
+.gallery-upload-preview .up-item img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 文字输入 */
+#gallery-text-input {
+    display: block;
+    width: 100%;
+    min-height: 110px;
+    margin-top: 14px;
+    padding: 12px 14px;
+    border: 1px solid #f0dce6;
+    border-radius: 10px;
+    font-size: 14.5px;
+    line-height: 1.7;
+    font-family: inherit;
+    color: #3a3a3a;
+    resize: vertical;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+#gallery-text-input:focus {
+    border-color: #ff9acb;
+}
+
+/* 底部 */
+.gallery-panel-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px 20px 18px;
+    border-top: 1px solid #f5e6ee;
+}
+
+.gallery-panel-tip {
+    font-size: 12px;
+    color: #b8a8b2;
+}
+
+.gallery-submit-btn {
+    background: linear-gradient(135deg, #ff9acb, #ff6fb3);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 8px 26px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 3px 12px rgba(255, 111, 179, 0.3);
+    transition: transform 0.18s ease;
+    white-space: nowrap;
+}
+
+.gallery-submit-btn:hover {
+    transform: translateY(-1px);
+}
+
+/* ==================== 夜间模式 ==================== */
+html.dark-mode .gallery-feature-image,
+html.dark-mode .gallery-cell {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+html.dark-mode .gallery-text {
+    color: #c9ccd4;
+}
+
+html.dark-mode .gallery-date {
+    color: #8a8f9c;
+}
+
+html.dark-mode .gallery-panel-box {
+    background: #1e212a;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+}
+
+html.dark-mode .gallery-panel-head {
+    border-bottom-color: #2c303a;
+    color: #ff9acb;
+}
+
+html.dark-mode .gallery-panel-body {
+    background: #1e212a;
+}
+
+html.dark-mode .gallery-upload-zone {
+    border-color: #3a3f4d;
+    background: rgba(255, 154, 203, 0.04);
+}
+
+html.dark-mode .gallery-upload-zone:hover {
+    border-color: #ff9acb;
+    background: rgba(255, 154, 203, 0.08);
+}
+
+html.dark-mode .gallery-upload-hint p {
+    color: #8a8f9c;
+}
+
+html.dark-mode #gallery-text-input {
+    background: #171a21;
+    border-color: #333743;
+    color: #dcdfe6;
+}
+
+html.dark-mode #gallery-text-input:focus {
+    border-color: #ff9acb;
+}
+
+html.dark-mode .gallery-panel-foot {
+    border-top-color: #2c303a;
+}
+
+html.dark-mode .gallery-panel-tip {
+    color: #7a8290;
+}
+
+/* ==================== 手机端 ==================== */
+@media (max-width: 768px) {
+    .gallery-feature {
+        flex-direction: column;
+        gap: 12px;
+    }
+    .gallery-feature-image {
+        flex: 1 1 auto;
+        max-width: 100%;
+    }
+    .gallery-grid {
+        gap: 4px;
+    }
+    .gallery-cell {
+        border-radius: 6px;
+    }
+    .gallery-panel-box {
+        max-height: 92vh;
+    }
+}
+
+/* ==================== 空状态 / 条目 / 提示条 ==================== */
+.gallery-empty {
+    text-align: center;
+    color: #b8a8b2;
+    font-size: 14px;
+    padding: 44px 20px;
+}
+
+/* 其他动态条目（日期 + 文字 + 九宫格） */
+.gallery-entry {
+    margin-top: 26px;
+}
+
+.gallery-entry .gallery-text {
+    margin-bottom: 10px;
+}
+
+.gallery-entry .gallery-grid {
+    margin-top: 8px;
+}
+
+/* 发布结果提示条 */
+#gallery-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 9%;
+    transform: translateX(-50%) translateY(10px);
+    max-width: 84vw;
+    background: rgba(40, 44, 54, 0.92);
+    color: #fff;
+    font-size: 13.5px;
+    line-height: 1.6;
+    padding: 10px 20px;
+    border-radius: 22px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.26s ease, transform 0.26s ease;
+    z-index: 100001;
+    text-align: center;
+}
+
+#gallery-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+#gallery-toast.ok {
+    background: linear-gradient(135deg, rgba(255, 154, 203, 0.96), rgba(255, 111, 179, 0.96));
+    box-shadow: 0 6px 24px rgba(255, 111, 179, 0.4);
+}
+
+#gallery-toast.err {
+    background: rgba(60, 64, 74, 0.95);
+}
