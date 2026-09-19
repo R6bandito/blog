@@ -23,6 +23,8 @@ hexo.extend.injector.register('body_end', '<script src="/js/pjax-custom.js"></sc
 
 // 页面微装饰：樱花飘落 + 点击礼花
 hexo.extend.injector.register('body_end', '<script src="/js/floating.js" defer></script>');
+// 代码复制成功提示
+hexo.extend.injector.register('body_end', '<script src="/js/copy-toast.js" defer></script>');
 
 // 点击礼花效果（Canvas 轻量粒子）
 
