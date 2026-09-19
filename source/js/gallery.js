@@ -1,12 +1,13 @@
-// 照片墙：数据渲染（data.json）+ 灯箱放大 + 本地发布
-// 发布按钮仅在本地环境（localhost / 127.0.0.1 / file 协议）显示，线上访客看不到也无法发布
+// 照片墙：数据渲染（data.json）+ 灯箱放大 + 本地发布/删除
+// 发布、删除仅在本地环境（localhost / 127.0.0.1 / file 协议）可用，线上访客看不到也无法调用
 (function () {
     if (window.__galleryInit) { return; }
     window.__galleryInit = true;
 
     var PUBLISH_API = 'http://127.0.0.1:4801/api/publish';
+    var DELETE_API = 'http://127.0.0.1:4801/api/delete';
 
-    // 是否本地环境（只有站主本机才显示发布功能）
+    // 是否本地环境（只有站主本机才有发布/删除功能）
     function isLocal() {
         var h = location.hostname;
         return h === 'localhost' || h === '127.0.0.1' || h === '' || location.protocol === 'file:';
@@ -33,6 +34,29 @@
         t.classList.add(ok === false ? 'err' : 'ok');
         clearTimeout(t.__timer);
         t.__timer = setTimeout(function () { t.classList.remove('show'); }, 3400);
+    }
+
+    function netErrorMessage(e) {
+        var msg = (e && e.message) ? e.message : '';
+        if (!msg || /failed to fetch|networkerror|connection|load failed/i.test(msg)) {
+            return '连不上发布服务——请先运行 tools/publish-server.js（或双击 tools/publish.bat）';
+        }
+        return msg;
+    }
+
+    // 删除按钮（仅本地渲染进 DOM）
+    function delHtml(entry, idx) {
+        if (!isLocal()) { return ''; }
+        return '<button class="gallery-del" type="button" title="删除这条动态"' +
+            ' data-id="' + escapeHtml(entry.id || '') + '"' +
+            ' data-index="' + idx + '"' +
+            ' data-date="' + escapeHtml(entry.date || '') + '">' +
+            '<i class="fas fa-trash-alt"></i></button>';
+    }
+
+    function dateRowHtml(entry, idx) {
+        var dateLine = escapeHtml(entry.date || '') + (entry.time ? ' ' + escapeHtml(entry.time) : '');
+        return '<div class="gallery-date-row"><span class="gallery-date">' + dateLine + '</span>' + delHtml(entry, idx) + '</div>';
     }
 
     // ---------- 渲染 ----------
@@ -68,7 +92,6 @@
         }
         data.forEach(function (entry, idx) {
             var imgs = entry.images || [];
-            var dateLine = escapeHtml(entry.date || '') + (entry.time ? ' ' + escapeHtml(entry.time) : '');
             if (idx === 0 && imgs.length) {
                 // 第一条：大图 + 文字
                 var f = document.createElement('div');
@@ -81,7 +104,7 @@
                 fi.appendChild(fim);
                 var ft = document.createElement('div');
                 ft.className = 'gallery-feature-text';
-                ft.innerHTML = '<div class="gallery-date">' + dateLine + '</div>' +
+                ft.innerHTML = dateRowHtml(entry, idx) +
                     (entry.text ? '<div class="gallery-text">' + escapeHtml(entry.text) + '</div>' : '');
                 f.appendChild(fi);
                 f.appendChild(ft);
@@ -91,7 +114,7 @@
                 // 其他条目：日期 + 文字 + 九宫格
                 var card = document.createElement('div');
                 card.className = 'gallery-entry';
-                card.innerHTML = '<div class="gallery-date">' + dateLine + '</div>' +
+                card.innerHTML = dateRowHtml(entry, idx) +
                     (entry.text ? '<div class="gallery-text">' + escapeHtml(entry.text) + '</div>' : '');
                 if (imgs.length) { card.appendChild(buildGrid(imgs)); }
                 feed.appendChild(card);
@@ -122,6 +145,35 @@
             .then(function (data) { renderFeed(data); })
             .catch(function () {
                 feed.innerHTML = '<div class="gallery-empty">内容加载失败，刷新重试</div>';
+            });
+    }
+
+    // ---------- 删除 ----------
+    function deleteEntry(btn) {
+        if (!isLocal()) { return; }
+        var id = btn.getAttribute('data-id') || '';
+        var index = parseInt(btn.getAttribute('data-index'), 10);
+        var date = btn.getAttribute('data-date') || '';
+        if (!window.confirm('删除这条动态？\n\n上传的图片会一并删除，并自动提交 git（推送前仍可找回）。')) {
+            return;
+        }
+        btn.disabled = true;
+        fetch(DELETE_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id, index: isNaN(index) ? undefined : index, date: date })
+        })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+                if (res && res.ok) {
+                    toast('已删除' + (res.files && res.files.length ? '（清理 ' + res.files.length + ' 张图片）' : ''), true);
+                    return loadFeed();
+                }
+                throw new Error((res && res.error) || '删除失败');
+            })
+            .catch(function (e) {
+                btn.disabled = false;
+                toast('删除失败：' + netErrorMessage(e), false);
             });
     }
 
@@ -166,6 +218,20 @@
         if (panel) {
             panel.addEventListener('click', function (e) {
                 if (e.target === panel) { panel.classList.remove('open'); }
+            });
+        }
+
+        // 删除按钮：事件委托（内容动态渲染，委托一次即可，PJAX 换元素后重绑）
+        var feed = document.getElementById('gallery-feed');
+        if (feed && !feed.dataset.delBound) {
+            feed.dataset.delBound = '1';
+            feed.addEventListener('click', function (e) {
+                var btn = e.target && e.target.closest ? e.target.closest('.gallery-del') : null;
+                if (btn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    deleteEntry(btn);
+                }
             });
         }
 
@@ -225,18 +291,13 @@
                             zone.classList.remove('has-files');
                             if (fileInput) { fileInput.value = ''; }
                             if (textInput) { textInput.value = ''; }
-                            toast('发布成功！已自动压缩 + 加水印' + (res.committed ? ' + git 提交' : ''), true);
+                            toast('发布成功！' + (res.committed ? ' 已自动提交 git' : ''), true);
                             return loadFeed();
                         }
                         throw new Error((res && res.error) || '发布失败');
                     })
                     .catch(function (e) {
-                        var msg = (e && e.message) ? e.message : '';
-                        if (!msg || /failed to fetch|networkerror|connection|load failed/i.test(msg)) {
-                            toast('连不上发布服务——请先运行 tools/publish-server.js（或双击 tools/publish.bat）', false);
-                        } else {
-                            toast('发布失败：' + msg, false);
-                        }
+                        toast('发布失败：' + netErrorMessage(e), false);
                     })
                     .then(function () {
                         submitting = false;

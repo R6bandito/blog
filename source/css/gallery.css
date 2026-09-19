@@ -429,3 +429,51 @@ html.dark-mode .gallery-panel-tip {
 #gallery-toast.err {
     background: rgba(60, 64, 74, 0.95);
 }
+
+/* ==================== 日期行 + 删除按钮 ==================== */
+.gallery-date-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.gallery-date-row .gallery-date {
+    margin-bottom: 0;
+}
+
+/* 小垃圾桶（仅本机显示；由 JS 决定是否渲染） */
+.gallery-del {
+    flex: 0 0 auto;
+    border: none;
+    background: transparent;
+    color: #cbb8c2;
+    font-size: 13px;
+    line-height: 1;
+    padding: 5px 7px;
+    border-radius: 7px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: color 0.18s ease, background 0.18s ease, opacity 0.18s ease;
+}
+
+.gallery-del:hover {
+    color: #e0568a;
+    background: rgba(224, 86, 138, 0.10);
+    opacity: 1;
+}
+
+.gallery-del:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+html.dark-mode .gallery-del {
+    color: #7a8290;
+}
+
+html.dark-mode .gallery-del:hover {
+    color: #ff9acb;
+    background: rgba(255, 154, 203, 0.12);
+}

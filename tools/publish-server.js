@@ -1,6 +1,7 @@
 // 照片墙 · 本地发布服务
-// 只在本机运行：浏览器里点"发布" → 本服务执行 压缩 + 水印 + 写文件 + 更新数据 + git 提交
-// 仅监听 127.0.0.1（外部不可访问）；线上站点没有此服务，访客无法发布
+// 只在本机运行：浏览器里点"发布"→ 本服务执行 压缩 + 写文件 + 更新数据 + git 提交
+//              浏览器里点"垃圾桶"→ 本服务执行 删数据 + 删图片 + git 提交
+// 仅监听 127.0.0.1（外部不可访问）；线上站点没有此服务，访客无法发布或删除
 //
 // 启动：node tools/publish-server.js   （或双击 tools/publish.bat）
 // 端口：4801
@@ -16,8 +17,6 @@ const PUBLIC_UPLOAD = path.join(ROOT, 'public', 'gallery', 'uploads');
 const SOURCE_DATA = path.join(ROOT, 'source', 'gallery', 'data.json');
 const PUBLIC_DATA = path.join(ROOT, 'public', 'gallery', 'data.json');
 const TMP = path.join(ROOT, '_watermark-tmp');
-const WM = 'E:/blog-image-originals/_watermark-template.png';
-const RATIO = 281 / 85;
 const MAX_BODY = 200 * 1024 * 1024;   // 200MB 上限
 
 function log() {
@@ -25,39 +24,47 @@ function log() {
     console.log('[' + t + '] ' + Array.prototype.join.call(arguments, ' '));
 }
 
-// 单张图片处理：原始 base64 → 压缩 webp + 水印 → 输出到目标路径
+function readData() {
+    let data = [];
+    try { data = JSON.parse(fs.readFileSync(SOURCE_DATA, 'utf8')); } catch (e) {}
+    return Array.isArray(data) ? data : [];
+}
+function writeData(data) {
+    const json = JSON.stringify(data, null, 2) + '\n';
+    fs.writeFileSync(SOURCE_DATA, json);
+    fs.writeFileSync(PUBLIC_DATA, json);
+}
+
+// 单张图片处理：原始 base64 → 压缩为 webp（照片墙图片不加水印）
 function processImage(base64, outPath) {
-    if (!fs.existsSync(WM)) { throw new Error('水印模板缺失: ' + WM); }
     fs.mkdirSync(TMP, { recursive: true });
     const base = path.basename(outPath, '.webp');
     const rawPath = path.join(TMP, '_pub_raw_' + base);
-    const plainPath = path.join(TMP, '_pub_plain_' + base + '.webp');
     fs.writeFileSync(rawPath, Buffer.from(base64, 'base64'));
 
-    // 1. 压缩为 webp
-    let r = spawnSync('ffmpeg', ['-y', '-i', rawPath, '-c:v', 'libwebp', '-quality', '80', plainPath], { encoding: 'utf8' });
-    if (r.status !== 0) {
-        try { fs.unlinkSync(rawPath); } catch (e) {}
-        throw new Error('压缩失败: ' + (r.stderr || '').split('\n').filter(l => /rror/.test(l)).slice(0, 1).join(''));
-    }
-
-    // 2. 自适应水印
-    const pr = spawnSync('ffprobe', ['-v', 'quiet', '-show_entries', 'stream=width,height', '-of', 'csv=p=0', plainPath], { encoding: 'utf8' });
-    const wh = (pr.stdout || '0,0').trim().split(',').map(Number);
-    const w = wh[0], h = wh[1];
-    let wmW = Math.round(w * 0.28);
-    if (wmW / RATIO > h * 0.4) { wmW = Math.round(h * 0.4 * RATIO); }
-    r = spawnSync('ffmpeg', ['-y', '-i', plainPath, '-i', WM,
-        '-filter_complex', '[1:v]scale=' + wmW + ':-1[wm];[0][wm]overlay=W-w-6:H-h-2',
-        '-c:v', 'libwebp', '-quality', '82', outPath], { encoding: 'utf8' });
-
+    const r = spawnSync('ffmpeg', ['-y', '-i', rawPath, '-c:v', 'libwebp', '-quality', '80', outPath], { encoding: 'utf8' });
     try { fs.unlinkSync(rawPath); } catch (e) {}
-    try { fs.unlinkSync(plainPath); } catch (e) {}
-    if (r.status !== 0) { throw new Error('加水印失败: ' + (r.stderr || '').split('\n').filter(l => /rror/.test(l)).slice(0, 1).join('')); }
-    return { w: w, h: h, size: fs.statSync(outPath).size };
+    if (r.status !== 0) {
+        throw new Error('图片处理失败: ' + (r.stderr || '').split('\n').filter(l => /rror/.test(l)).slice(0, 1).join(''));
+    }
+    const pr = spawnSync('ffprobe', ['-v', 'quiet', '-show_entries', 'stream=width,height', '-of', 'csv=p=0', outPath], { encoding: 'utf8' });
+    const wh = (pr.stdout || '0,0').trim().split(',').map(Number);
+    return { w: wh[0] || 0, h: wh[1] || 0, size: fs.statSync(outPath).size };
 }
 
-// 处理一整个发布请求
+function gitCommit(msg) {
+    try {
+        spawnSync('git', ['add', '-A', 'source/gallery'], { cwd: ROOT, encoding: 'utf8' });
+        const c = spawnSync('git', ['commit', '-m', msg], { cwd: ROOT, encoding: 'utf8' });
+        const out = ((c.stdout || '') + (c.stderr || '')).trim();
+        if (c.status === 0) { return { committed: true, msg: '' }; }
+        // 没有变更时也算正常
+        if (/nothing to commit/i.test(out)) { return { committed: true, msg: '（无变更）' }; }
+        return { committed: false, msg: out.split('\n')[0] || '提交失败' };
+    } catch (e) { return { committed: false, msg: e.message }; }
+}
+
+// ---------- 发布 ----------
 function handlePublish(body) {
     const text = (body.text || '').trim();
     const images = body.images || [];
@@ -85,30 +92,57 @@ function handlePublish(body) {
         log('图片 ' + (i + 1) + '/' + images.length + ' 完成: ' + name + ' (' + info.w + '×' + info.h + ', ' + (info.size / 1024).toFixed(0) + 'KB)');
     });
 
-    // 更新数据（新条目放最前）
-    let data = [];
-    try { data = JSON.parse(fs.readFileSync(SOURCE_DATA, 'utf8')); } catch (e) {}
-    if (!Array.isArray(data)) { data = []; }
-    const entry = { date: dateStr, time: timeStr, text: text, images: urls };
+    const data = readData();
+    const entry = {
+        id: String(now.getTime()) + '-' + Math.random().toString(36).slice(2, 7),
+        date: dateStr,
+        time: timeStr,
+        text: text,
+        images: urls
+    };
     data.unshift(entry);
-    const json = JSON.stringify(data, null, 2);
-    fs.writeFileSync(SOURCE_DATA, json);
-    fs.writeFileSync(PUBLIC_DATA, json);
+    writeData(data);
 
-    // git 提交（不 push，由你自己决定何时推送）
-    let committed = false, commitMsg = '';
-    try {
-        spawnSync('git', ['add', 'source/gallery'], { cwd: ROOT, encoding: 'utf8' });
-        const c = spawnSync('git', ['commit', '-m', '照片墙：发布 ' + urls.length + ' 张照片'], { cwd: ROOT, encoding: 'utf8' });
-        committed = c.status === 0;
-        if (!committed) { commitMsg = ((c.stdout || '') + (c.stderr || '')).trim().split('\n')[0] || '提交失败'; }
-    } catch (e) { commitMsg = e.message; }
-
-    return { entry: entry, committed: committed, commitMsg: commitMsg };
+    const g = gitCommit('照片墙：发布 ' + (urls.length ? urls.length + ' 张照片' : '一条文字'));
+    return { entry: entry, committed: g.committed, commitMsg: g.msg };
 }
 
+// ---------- 删除 ----------
+function handleDelete(body) {
+    const data = readData();
+    let idx = -1;
+
+    // 优先按 id 找；老条目没有 id 时按索引 + 日期校验
+    if (body.id) {
+        idx = data.findIndex(function (e) { return e && e.id === body.id; });
+    }
+    if (idx < 0 && typeof body.index === 'number' && body.index >= 0 && body.index < data.length) {
+        const e = data[body.index];
+        if (!body.date || e.date === body.date) { idx = body.index; }
+    }
+    if (idx < 0) { throw new Error('找不到这条动态（可能已被删除，刷新页面重试）'); }
+
+    const entry = data[idx];
+    // 只删除上传目录里的图片；站点公共图（如 /images/xxx）不动
+    const removed = [];
+    (entry.images || []).forEach(function (u) {
+        if (u && u.indexOf('/gallery/uploads/') === 0) {
+            const name = path.basename(u);
+            [path.join(SOURCE_UPLOAD, name), path.join(PUBLIC_UPLOAD, name)].forEach(function (f) {
+                try { if (fs.existsSync(f)) { fs.unlinkSync(f); removed.push(name); } } catch (e) {}
+            });
+        }
+    });
+    data.splice(idx, 1);
+    writeData(data);
+
+    const g = gitCommit('照片墙：删除一条动态（' + removed.length + ' 张图片）');
+    log('已删除动态: ' + (entry.text || '(无文字)').substring(0, 24) + '，清理图片 ' + removed.length + ' 个文件');
+    return { deleted: entry, files: removed, committed: g.committed, commitMsg: g.msg };
+}
+
+// ---------- HTTP ----------
 const server = http.createServer(function (req, res) {
-    // CORS（本地服务，允许博客页面调用）
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -118,12 +152,7 @@ const server = http.createServer(function (req, res) {
         res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(JSON.stringify(obj));
     }
-
-    if (req.method === 'GET' && req.url === '/api/ping') {
-        return send(200, { ok: true, service: '照片墙本地发布服务', note: '浏览器里的"发布"按钮会自动连接本服务' });
-    }
-
-    if (req.method === 'POST' && req.url === '/api/publish') {
+    function readBody(cb) {
         let size = 0;
         const chunks = [];
         let aborted = false;
@@ -133,20 +162,41 @@ const server = http.createServer(function (req, res) {
             chunks.push(c);
         });
         req.on('end', function () {
-            if (aborted) { return send(413, { ok: false, error: '内容过大（上限 200MB）' }); }
-            let body;
-            try { body = JSON.parse(Buffer.concat(chunks).toString('utf8')); }
-            catch (e) { return send(400, { ok: false, error: '数据解析失败: ' + e.message }); }
+            if (aborted) { return cb(new Error('内容过大（上限 200MB）')); }
+            try { cb(null, JSON.parse(Buffer.concat(chunks).toString('utf8'))); }
+            catch (e) { cb(new Error('数据解析失败: ' + e.message)); }
+        });
+    }
+
+    if (req.method === 'GET' && req.url === '/api/ping') {
+        return send(200, { ok: true, service: '照片墙本地发布服务' });
+    }
+
+    if (req.method === 'POST' && req.url === '/api/publish') {
+        return readBody(function (err, body) {
+            if (err) { return send(400, { ok: false, error: err.message }); }
             try {
-                const result = handlePublish(body);
-                log('发布成功: ' + result.entry.images.length + ' 张图' + (result.entry.text ? ' + 文字' : '') + (result.committed ? ' （已 git 提交）' : ' （git 未提交: ' + result.commitMsg + '）'));
-                send(200, { ok: true, entry: result.entry, committed: result.committed, commitMsg: result.commitMsg });
+                const r = handlePublish(body);
+                log('发布成功: ' + r.entry.images.length + ' 张图' + (r.entry.text ? ' + 文字' : '') + (r.committed ? ' （已 git 提交）' : '（git: ' + r.commitMsg + '）'));
+                send(200, { ok: true, entry: r.entry, committed: r.committed, commitMsg: r.commitMsg });
             } catch (e) {
                 log('发布失败: ' + e.message);
                 send(500, { ok: false, error: e.message });
             }
         });
-        return;
+    }
+
+    if (req.method === 'POST' && req.url === '/api/delete') {
+        return readBody(function (err, body) {
+            if (err) { return send(400, { ok: false, error: err.message }); }
+            try {
+                const r = handleDelete(body);
+                send(200, { ok: true, files: r.files, committed: r.committed, commitMsg: r.commitMsg });
+            } catch (e) {
+                log('删除失败: ' + e.message);
+                send(500, { ok: false, error: e.message });
+            }
+        });
     }
 
     send(404, { ok: false, error: '未知接口' });
@@ -154,7 +204,7 @@ const server = http.createServer(function (req, res) {
 
 server.listen(PORT, '127.0.0.1', function () {
     log('照片墙本地发布服务已启动: http://127.0.0.1:' + PORT);
-    log('用法: 打开博客照片墙页面，点"发布"→ 选图写字 → 发布（自动压缩+水印+更新+git 提交）');
+    log('支持: 发布（压缩 webp，不加水印）/ 删除（清数据 + 清图片 + git 提交）');
     log('（本服务仅本机可访问；关闭此窗口即停止）');
 });
 server.on('error', function (e) {
