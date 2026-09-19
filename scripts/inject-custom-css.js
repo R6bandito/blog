@@ -68,3 +68,8 @@ hexo.extend.injector.register('body_end', [
     '</div>',
     '<script src="/js/music.js"></script>'
 ].join(''));
+
+// 夜间模式：head 内联（渲染前设置 class，防闪白）
+hexo.extend.injector.register('head_begin', "<script>(function(){try{var d=localStorage.getItem('r6blog-theme')==='dark';if(d){document.documentElement.classList.add('dark-mode')}}catch(e){}})();</script>");
+// 夜间模式：主脚本（切换按钮 + 状态管理 + 背景组联动）
+hexo.extend.injector.register('body_end', '<script src="/js/theme-toggle.js" defer></script>');

@@ -541,3 +541,403 @@ figure.highlight.copying ::-moz-selection {
 .lg-object {
     box-shadow: 0 8px 40px rgba(180, 140, 160, 0.28);
 }
+
+/* ==================== 夜间模式（框架版） ==================== */
+/* 兜底整页底色与文字 */
+html.dark-mode body {
+    background-color: #14161c;
+    color: #c9ccd4;
+}
+/* 卡片/面板 */
+html.dark-mode .card,
+html.dark-mode .card-content,
+html.dark-mode .box,
+html.dark-mode .section {
+    background-color: rgba(24, 27, 35, 0.45);
+}
+/* 标题 */
+html.dark-mode h1, html.dark-mode h2, html.dark-mode h3,
+html.dark-mode h4, html.dark-mode h5, html.dark-mode h6,
+html.dark-mode .article-title,
+html.dark-mode .card-header-title,
+html.dark-mode .title, html.dark-mode .subtitle {
+    color: #f2f4f8;
+}
+/* 链接（暗色下用亮粉） */
+html.dark-mode a { color: #ff9acb; }
+html.dark-mode a:hover { color: #ffb8da; }
+/* 导航栏 / 页脚 */
+html.dark-mode .navbar,
+html.dark-mode .footer {
+    background-color: rgba(22, 24, 30, 0.78);
+}
+html.dark-mode .navbar-item,
+html.dark-mode .navbar-link {
+    color: #c9ccd4;
+}
+html.dark-mode .navbar a.navbar-item:hover,
+html.dark-mode .navbar a.navbar-item.is-active,
+html.dark-mode .navbar .navbar-link:hover,
+html.dark-mode .navbar .navbar-link.is-active {
+    background-color: rgba(255, 154, 203, 0.12) !important;
+    color: #ff9acb;
+}
+/* 次要信息（日期、标签等） */
+html.dark-mode .article-meta,
+html.dark-mode .is-size-7 {
+    color: #8a8f9c;
+}
+/* 粉色渐变分割线：夜间调暗 */
+html.dark-mode .article .content hr {
+    background: linear-gradient(90deg, transparent, rgba(255, 154, 203, 0.5), transparent);
+}
+/* 引用块 */
+html.dark-mode .article .content blockquote {
+    background: rgba(255, 154, 203, 0.08);
+    border-left-color: #ff9acb;
+    color: #b9bdc8;
+}
+/* 行内代码 */
+html.dark-mode .article .content code:not([class]) {
+    background: rgba(255, 154, 203, 0.16);
+    color: #ffb0d4;
+}
+/* 表格 */
+html.dark-mode .article .content table th {
+    background: rgba(255, 154, 203, 0.1);
+    color: #e8eaf0;
+}
+html.dark-mode .article .content table td {
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #c9ccd4;
+}
+html.dark-mode .article .content table tr:hover {
+    background: rgba(255, 154, 203, 0.05);
+}
+/* 背景柔化遮罩：夜间改为"压暗"（不再是白色柔化） */
+html.dark-mode .site-bg-layer::after {
+    background: rgba(8, 10, 16, 0.18);   /* 仅轻微压暗，保持夜景图的通透感 */
+}
+/* 主题切换按钮 */
+#theme-toggle {
+    cursor: pointer;
+}
+
+/* 夜间模式修正：文字可读性（覆盖正文各元素，提亮） */
+html.dark-mode body,
+html.dark-mode .content,
+html.dark-mode .article .content,
+html.dark-mode .article .content p,
+html.dark-mode .article .content li,
+html.dark-mode .article .content td,
+html.dark-mode .card-content,
+html.dark-mode .card-content p {
+    color: #dcdfe6;
+}
+/* 夜间模式修正：切换按钮不残留高亮（点击后不发白） */
+#theme-toggle,
+#theme-toggle:focus,
+#theme-toggle:active,
+.navbar a.navbar-item#theme-toggle:hover {
+    background-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+html.dark-mode #theme-toggle:hover {
+    background-color: rgba(255, 154, 203, 0.12) !important;
+    color: #ff9acb !important;
+}
+html:not(.dark-mode) #theme-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    color: #d94a86 !important;
+}
+
+/* 夜间模式修正：加粗文字（icarus 默认深灰，夜里看不清） */
+html.dark-mode .article .content strong,
+html.dark-mode .article .content b,
+html.dark-mode .content strong,
+html.dark-mode .content b,
+html.dark-mode strong,
+html.dark-mode b {
+    color: #ffffff;
+}
+html.dark-mode a strong,
+html.dark-mode a b {
+    color: inherit;
+}
+/* 主题切换过渡动画：切换瞬间全局渐变色（触发后 400ms 自动移除） */
+html.theme-transition,
+html.theme-transition body,
+html.theme-transition body *:not(.site-bg-layer):not(.site-bg-layer *),
+html.theme-transition .card,
+html.theme-transition .navbar,
+html.theme-transition .footer,
+html.theme-transition .site-bg-layer::after {
+    transition: background-color 0.45s ease, color 0.45s ease, border-color 0.45s ease !important;
+}
+
+/* ==================== 夜间模式：交互组件（第二步） ==================== */
+/* 1. 搜索面板 */
+html.dark-mode .searchbox {
+    background: rgba(8, 10, 15, 0.92);
+}
+html.dark-mode .searchbox-header,
+html.dark-mode .searchbox-input {
+    background: #1c1f27;
+    color: #dcdfe6;
+}
+html.dark-mode .searchbox-input::placeholder {
+    color: #6f7683;
+}
+html.dark-mode .searchbox-body,
+html.dark-mode .searchbox-result-item {
+    color: #c9ccd4;
+}
+html.dark-mode .searchbox-result-item:hover {
+    background: rgba(255, 154, 203, 0.1);
+}
+html.dark-mode .searchbox-result-title {
+    color: #f0f2f6;
+}
+html.dark-mode .searchbox-result-content {
+    color: #9aa0ab;
+}
+/* 2. 分页器 */
+html.dark-mode .pagination-link,
+html.dark-mode .pagination-next a,
+html.dark-mode .pagination-previous a,
+html.dark-mode .pagination-ellipsis {
+    background-color: #1e212a;
+    border-color: #333743;
+    color: #c9ccd4;
+}
+html.dark-mode .pagination-link:hover,
+html.dark-mode .pagination-next a:hover,
+html.dark-mode .pagination-previous a:hover {
+    border-color: #ff9acb;
+    color: #ff9acb;
+}
+html.dark-mode .pagination-link.is-current {
+    background-color: #d94a86;
+    border-color: #d94a86;
+    color: #fff;
+}
+/* 3. 回到顶部按钮 */
+html.dark-mode #back-to-top {
+    background-color: rgba(30, 33, 42, 0.9) !important;
+    color: #ff9acb !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4) !important;
+}
+/* 4. 音乐播放器 */
+html.dark-mode #music-toggle {
+    background: rgba(30, 33, 42, 0.92);
+    color: #ff9acb;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+html.dark-mode #music-bar {
+    background: rgba(30, 33, 42, 0.95);
+    color: #c9ccd4;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+html.dark-mode #music-bar button {
+    color: #c9ccd4;
+}
+html.dark-mode #music-bar button:hover {
+    color: #ff9acb;
+}
+html.dark-mode #music-title {
+    color: #c9ccd4;
+}
+/* 5. 灯箱（图片放大）：夜间改深色 */
+html.dark-mode .lg-backdrop {
+    background-color: rgba(10, 12, 17, 0.95) !important;
+}
+html.dark-mode .lg-toolbar {
+    background-color: rgba(20, 22, 28, 0.85) !important;
+}
+html.dark-mode .lg-toolbar .lg-icon {
+    color: #b8bcc6 !important;
+}
+html.dark-mode .lg-toolbar .lg-icon:hover {
+    color: #ff9acb !important;
+}
+html.dark-mode .lg-actions .lg-next,
+html.dark-mode .lg-actions .lg-prev {
+    background-color: rgba(20, 22, 28, 0.85) !important;
+    color: #b8bcc6 !important;
+}
+html.dark-mode .lg-actions .lg-next:hover,
+html.dark-mode .lg-actions .lg-prev:hover {
+    color: #ff9acb !important;
+}
+html.dark-mode .lg-sub-html {
+    background-color: rgba(20, 22, 28, 0.85) !important;
+    color: #c9ccd4 !important;
+}
+html.dark-mode .lg-object {
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* ==================== 夜间模式：第三批修正（分页外层/搜索完整/滚动条） ==================== */
+/* 1. 分页器：外层 div 的白底/白边去掉 */
+html.dark-mode .pagination-previous,
+html.dark-mode .pagination-next {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+html.dark-mode .pagination-previous a,
+html.dark-mode .pagination-next a {
+    display: inline-block;
+    background-color: #1e212a !important;
+    border: 1px solid #3a3f4d !important;
+    border-radius: 999px !important;
+    color: #c9ccd4 !important;
+    padding: 0.5em 1.4em !important;
+}
+html.dark-mode .pagination-previous a:hover,
+html.dark-mode .pagination-next a:hover {
+    border-color: #ff9acb !important;
+    color: #ff9acb !important;
+}
+/* 2. 搜索面板：容器/结果区完整暗色 */
+html.dark-mode .searchbox-container {
+    background: transparent;
+}
+html.dark-mode .searchbox-body {
+    background: #171a21;
+    border-top-color: #2c303a;
+}
+html.dark-mode .searchbox-result-item {
+    background: transparent;
+}
+html.dark-mode .searchbox-result-item:hover {
+    background: rgba(255, 154, 203, 0.12);
+}
+html.dark-mode .searchbox-result-item b,
+html.dark-mode .searchbox-result-item strong {
+    color: #ffb0d4;
+}
+/* 3. 滚动条：暗色下粉色 + 深色轨道（内容列 / 全站） */
+html.dark-mode * {
+    scrollbar-color: rgba(255, 154, 203, 0.45) rgba(255, 255, 255, 0.06);
+}
+html.dark-mode ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+html.dark-mode ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 5px;
+}
+html.dark-mode ::-webkit-scrollbar-thumb {
+    background: rgba(255, 154, 203, 0.45);
+    border-radius: 5px;
+}
+html.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 154, 203, 0.65);
+}
+
+/* ==================== 夜间模式：第四批修正（圆角 + 悬停暗化） ==================== */
+/* 1. 分页按钮全圆角（去方形缩边感） */
+html.dark-mode .pagination-previous a,
+html.dark-mode .pagination-next a,
+html.dark-mode .pagination-link,
+html.dark-mode .pagination-ellipsis {
+    border-radius: 999px !important;
+}
+/* 2. 分类/侧边菜单的悬停（原 #f5f5f5 白） */
+html.dark-mode .menu-list a:hover {
+    background-color: rgba(255, 154, 203, 0.12) !important;
+    color: #ff9acb !important;
+}
+html.dark-mode .menu-list a.is-active {
+    background-color: rgba(255, 154, 203, 0.16) !important;
+    color: #ff9acb !important;
+}
+html.dark-mode .menu-list li ul {
+    border-left-color: #333743 !important;
+}
+/* 3. 搜索面板的悬停（原纯白 #fff） */
+html.dark-mode .searchbox .searchbox-result-item:not(.disabled):not(.active):not(:active):hover {
+    background-color: rgba(255, 154, 203, 0.12) !important;
+}
+html.dark-mode .searchbox .searchbox-close:hover {
+    background: rgba(255, 154, 203, 0.15) !important;
+}
+html.dark-mode .searchbox-pagination-link:hover,
+html.dark-mode .searchbox .searchbox-pagination .searchbox-pagination-item:not(.active):not(.disabled) .searchbox-pagination-link:hover {
+    background-color: rgba(255, 154, 203, 0.12) !important;
+    color: #ff9acb !important;
+}
+/* 4. 通用：导航下拉/面板等残留的亮底悬停 */
+html.dark-mode .navbar-dropdown a.navbar-item:hover,
+html.dark-mode .navbar-dropdown a.navbar-item:focus,
+html.dark-mode a.dropdown-item:hover,
+html.dark-mode button.dropdown-item:hover {
+    background-color: rgba(255, 154, 203, 0.12) !important;
+    color: #ff9acb !important;
+}
+html.dark-mode .panel-block:hover {
+    background-color: rgba(255, 154, 203, 0.08) !important;
+}
+/* 5. 标签云/标签悬停 */
+html.dark-mode .tag:not(body):hover {
+    background-color: rgba(255, 154, 203, 0.18) !important;
+    color: #ff9acb !important;
+}
+/* 6. 兜底：卡片内的链接悬停不要背景 */
+html.dark-mode .card a:hover,
+html.dark-mode .box a:hover,
+html.dark-mode .article a:hover {
+    background-color: transparent !important;
+}
+
+/* "关注我"按钮：白天保持原蓝色（Bulma 默认），夜间模式才变粉 */
+html.dark-mode .button.is-primary,
+html.dark-mode .button.is-primary.is-rounded {
+    background-color: #ff6fb3 !important;
+    border-color: transparent !important;
+    color: #fff !important;
+}
+html.dark-mode .button.is-primary:hover,
+html.dark-mode .button.is-primary.is-rounded:hover {
+    background-color: #ff8fc4 !important;
+    color: #fff !important;
+}
+
+/* ==================== 夜间模式：标签/选项卡修正 ==================== */
+/* 标签云/标签页的标签块（原浅灰白 #f5f5f5） */
+html.dark-mode .tag:not(body) {
+    background-color: rgba(255, 154, 203, 0.14) !important;
+    color: #ffb0d4 !important;
+}
+/* 标签带计数（has-addons 的第二个 tag 通常是深色，统一处理） */
+html.dark-mode .tags.has-addons .tag:not(body) {
+    background-color: rgba(255, 154, 203, 0.14) !important;
+    color: #ffb0d4 !important;
+}
+html.dark-mode .tags.has-addons .tag:not(body):last-child {
+    background-color: rgba(255, 154, 203, 0.24) !important;
+    color: #ffd6ea !important;
+}
+/* 文章页的标签/分类链接 */
+html.dark-mode .article .tag,
+html.dark-mode .card .tag {
+    background-color: rgba(255, 154, 203, 0.14) !important;
+    color: #ffb0d4 !important;
+}
+html.dark-mode .tag:hover,
+html.dark-mode .tags.has-addons:hover .tag {
+    background-color: rgba(255, 154, 203, 0.3) !important;
+    color: #fff !important;
+}
+/* 菜单标签（"标签"、"分类"小标题） */
+html.dark-mode .menu-label {
+    color: #9aa0ab !important;
+}
+
+/* 夜间模式：站点标题（左上角"R6bandito 的笔记"）高亮 */
+html.dark-mode .nav-site-title {
+    color: #f0f2f6 !important;
+}

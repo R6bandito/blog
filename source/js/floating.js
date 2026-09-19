@@ -1,33 +1,40 @@
-// 页面微装饰：樱花飘落 + 点击礼花 + 背景微光点
-// 设计原则：轻量（单 rAF 循环驱动两个 Canvas）、克制、不干扰正文
+// 页面微装饰：樱花飘落 + 点击礼花 + 背景微光点 + 夜间雨丝
+// 设计原则：轻量（单 rAF 循环驱动多个 Canvas）、克制、不干扰正文
 // 参数集中在下方 CONFIG，可随时调整
 (function () {
     if (window.__floatingInit) { return; }
     window.__floatingInit = true;
+    // 系统「减少动态效果」：跳过持续动画（花瓣/光点/雨丝），但保留点击礼花
     var CONFIG = {
-        // 无视系统「减少动态效果」偏好强制开启（站主设置：你的系统开了减少动画时，花瓣仍显示）
         ignoreReduceMotion: true,
-        // 樱花花瓣（飘在内容上方，淡而小）
+        // 樱花花瓣（白天）
         petalColors: ['#ffc2dd', '#ff9acb', '#ffd6ea', '#f8a5c8', '#ffb3d4'],
         petalMin: 7, petalMax: 16,
         petalAlpha: [0.30, 0.60],
+        petalAlphaDark: [0.46, 0.74],     // 夜间：对比稍强（更清晰）
         petalSpeed: [0.25, 0.8],
         countPerWidth: 120,
         countMax: 14,
+        nightPetalFactor: 0.6,            // 夜间：花瓣数量乘以该系数（更少）
         // 点击礼花
         confettiCount: 12,
         confettiColors: ['#ff6fb3', '#ffa726', '#26c6da', '#66bb6a', '#ab47bc', '#ffca28', '#ef5350', '#ff8a65'],
-        // 背景微光点（在背景图之上、正文之下，不碰内容）
+        // 背景微光点
         dotCount: 22,
         dotColors: ['#ffd6ea', '#ffc2dd', '#ffe9f3', '#fff0f7'],
         dotAlpha: [0.08, 0.22],
         dotR: [1.2, 4.0],
-        dotSpeed: 0.12
+        dotSpeed: 0.12,
+        // 夜间雨丝（仅暗色模式）
+        rainStreakMax: 90,
+        rainStreakAlpha: [0.16, 0.30]     // 雨丝透明度（更明显）
     };
-
-    // 系统「减少动态效果」：跳过持续动画（花瓣/光点），但保留点击礼花（可用 CONFIG.ignoreReduceMotion 强制开启）
     var sysReduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     var reduceMotion = sysReduce && !CONFIG.ignoreReduceMotion;
+
+    function isDark() {
+        return document.documentElement.classList.contains('dark-mode');
+    }
 
     // ==================== 上层 Canvas：花瓣 + 礼花 ====================
     var canvas = document.createElement('canvas');
@@ -35,7 +42,13 @@
     document.body.appendChild(canvas);
     var ctx = canvas.getContext('2d');
 
-    // ==================== 下层 Canvas：微光点（z-index:-1） ====================
+    // ==================== 雨丝 Canvas（最上层，仅夜间显示） ====================
+    var rCanvas = document.createElement('canvas');
+    rCanvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100vh;height:100lvh;pointer-events:none;z-index:9999';
+    document.body.appendChild(rCanvas);
+    var rCtx = rCanvas.getContext('2d');
+
+    // ==================== 下层 Canvas：微光点 ====================
     var bCanvas = document.createElement('canvas');
     bCanvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100vh;height:100lvh;pointer-events:none';
     document.body.insertBefore(bCanvas, document.body.firstChild);
@@ -46,6 +59,9 @@
         canvas.width = innerWidth * dpr;
         canvas.height = innerHeight * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        rCanvas.width = innerWidth * dpr;
+        rCanvas.height = innerHeight * dpr;
+        rCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
         bCanvas.width = innerWidth * dpr;
         bCanvas.height = innerHeight * dpr;
         bCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -56,6 +72,8 @@
     // ---------- 樱花花瓣 ----------
     var petals = [];
     function makePetal(fromTop) {
+        var dark = isDark();
+        var range = dark ? CONFIG.petalAlphaDark : CONFIG.petalAlpha;
         return {
             x: Math.random() * innerWidth,
             y: fromTop ? -20 - Math.random() * 80 : Math.random() * innerHeight,
@@ -65,13 +83,14 @@
             phase: Math.random() * Math.PI * 2,
             rot: Math.random() * Math.PI * 2,
             vr: (Math.random() - 0.5) * 0.02,
-            alpha: CONFIG.petalAlpha[0] + Math.random() * (CONFIG.petalAlpha[1] - CONFIG.petalAlpha[0]),
+            alpha: range[0] + Math.random() * (range[1] - range[0]),
             color: CONFIG.petalColors[Math.floor(Math.random() * CONFIG.petalColors.length)]
         };
     }
     function resetPetals() {
         if (reduceMotion) { petals = []; return; }
         var n = Math.max(6, Math.min(CONFIG.countMax, Math.floor(innerWidth / CONFIG.countPerWidth)));
+        if (isDark()) { n = Math.max(4, Math.round(n * CONFIG.nightPetalFactor)); }
         petals = [];
         for (var i = 0; i < n; i++) petals.push(makePetal(false));
     }
@@ -91,6 +110,16 @@
         ctx.fill();
         ctx.restore();
     }
+
+    // 主题切换时重建花瓣（应用/退出夜间参数）
+    try {
+        var mo = new MutationObserver(function (muts) {
+            for (var i = 0; i < muts.length; i++) {
+                if (muts[i].attributeName === 'class') { resetPetals(); break; }
+            }
+        });
+        mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    } catch (e) {}
 
     // ---------- 点击礼花 ----------
     var confetti = [];
@@ -118,8 +147,28 @@
     }
     resetDots();
 
+    // ---------- 夜间雨丝 ----------
+    var streaks = [];
+    function makeStreak(fromTop) {
+        return {
+            x: Math.random() * (innerWidth + 160) - 80,
+            y: fromTop ? -30 - Math.random() * innerHeight : Math.random() * innerHeight,
+            len: 7 + Math.random() * 13,
+            vy: 6 + Math.random() * 8,
+            vx: 0.8 + Math.random() * 0.8,
+            alpha: CONFIG.rainStreakAlpha[0] + Math.random() * (CONFIG.rainStreakAlpha[1] - CONFIG.rainStreakAlpha[0])
+        };
+    }
+    function resetStreaks() {
+        if (reduceMotion) { streaks = []; return; }
+        var n = Math.min(CONFIG.rainStreakMax, Math.floor(innerWidth / 14));
+        streaks = [];
+        for (var i = 0; i < n; i++) streaks.push(makeStreak(false));
+    }
+    resetStreaks();
+
     var t = 0, raf = null, hidden = false;
-    if (window.console && console.log) { console.log('[floating] init, reduceMotion=' + reduceMotion + ', petals=' + petals.length + ', dots=' + dots.length); }
+    var rainCleared = true;
     document.addEventListener('visibilitychange', function () {
         hidden = document.hidden;
         if (!hidden && !raf) { raf = requestAnimationFrame(loop); }
@@ -156,6 +205,30 @@
             bCtx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
             bCtx.fill();
             bCtx.restore();
+        }
+
+        // ---------- 夜间雨丝（仅暗色模式） ----------
+        if (isDark()) {
+            rainCleared = false;
+            rCtx.clearRect(0, 0, rCanvas.width, rCanvas.height);
+            rCtx.lineWidth = 1;
+            for (var s = 0; s < streaks.length; s++) {
+                var st = streaks[s];
+                st.y += st.vy;
+                st.x += st.vx;
+                if (st.y > innerHeight + 30 || st.x > innerWidth + 30) { streaks[s] = makeStreak(true); continue; }
+                rCtx.save();
+                rCtx.globalAlpha = st.alpha;
+                rCtx.strokeStyle = '#cfe0f5';
+                rCtx.beginPath();
+                rCtx.moveTo(st.x, st.y);
+                rCtx.lineTo(st.x - st.vx * 3.2, st.y - st.len);
+                rCtx.stroke();
+                rCtx.restore();
+            }
+        } else if (!rainCleared) {
+            rCtx.clearRect(0, 0, rCanvas.width, rCanvas.height);
+            rainCleared = true;
         }
 
         // 礼花：重力 + 旋转 + 淡出
