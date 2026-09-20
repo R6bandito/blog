@@ -155,6 +155,11 @@
             });
     }
 
+    // 变更后延迟刷新：hexo server 需要约 0.5s 把新数据同步到它的内存路由
+    function refreshSoon() {
+        setTimeout(function () { loadFeed(); }, 1500);
+    }
+
     // ---------- 删除 ----------
     function deleteEntry(btn) {
         if (!isLocal()) { return; }
@@ -174,7 +179,7 @@
             .then(function (res) {
                 if (res && res.ok) {
                     toast('已删除' + (res.files && res.files.length ? '（清理 ' + res.files.length + ' 张图片）' : ''), true);
-                    return loadFeed();
+                    refreshSoon();
                 }
                 throw new Error((res && res.error) || '删除失败');
             })
@@ -349,7 +354,7 @@
                                 panel.classList.remove('open');
                                 resetPanel();
                                 toast('已保存' + (res.committed ? '（已提交 git）' : ''), true);
-                                return loadFeed();
+                                refreshSoon();
                             }
                             throw new Error((res && res.error) || '保存失败');
                         })
@@ -390,7 +395,7 @@
                             panel.classList.remove('open');
                             resetPanel();
                             toast('发布成功！' + (res.committed ? ' 已自动提交 git' : ''), true);
-                            return loadFeed();
+                            refreshSoon();
                         }
                         throw new Error((res && res.error) || '发布失败');
                     })
