@@ -77,3 +77,6 @@ hexo.extend.injector.register('body_end', '<script src="/js/theme-toggle.js" def
 // 照片墙：样式 + 交互脚本（全站注入，页面内自动识别，PJAX 兼容）
 hexo.extend.injector.register('head_end', '<link rel="stylesheet" href="/css/gallery.css">');
 hexo.extend.injector.register('body_end', '<script src="/js/gallery.js" defer></script>');
+
+// 页脚：本站已运行天数
+hexo.extend.injector.register('body_end', '<script src="/js/site-days.js" defer></script>');

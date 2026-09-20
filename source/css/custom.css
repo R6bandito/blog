@@ -941,3 +941,13 @@ html.dark-mode .menu-label {
 html.dark-mode .nav-site-title {
     color: #f0f2f6 !important;
 }
+
+/* ==================== 页脚：本站已运行天数 ==================== */
+#site-days b {
+    color: #e0568a;
+    font-weight: 600;
+}
+
+html.dark-mode #site-days b {
+    color: #ff9acb;
+}
