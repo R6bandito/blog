@@ -22,7 +22,7 @@ comments: false
   <div class="gallery-publish-panel" id="gallery-publish-panel">
     <div class="gallery-panel-box">
       <div class="gallery-panel-head">
-        <span>发布新动态</span>
+        <span id="gallery-panel-title">发布新动态</span>
         <a href="javascript:;" id="gallery-panel-close">×</a>
       </div>
       <div class="gallery-panel-body">
@@ -37,7 +37,7 @@ comments: false
         <textarea id="gallery-text-input" placeholder="写点什么……（碎碎念/拍摄记录/心情）"></textarea>
       </div>
       <div class="gallery-panel-foot">
-        <span class="gallery-panel-tip">自动压缩 + 加水印 + 更新页面</span>
+        <span class="gallery-panel-tip" id="gallery-panel-tip">自动压缩 webp + 更新页面</span>
         <button id="gallery-panel-submit" class="gallery-submit-btn">发布</button>
       </div>
     </div>

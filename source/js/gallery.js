@@ -1,13 +1,14 @@
-// 照片墙：数据渲染（data.json）+ 灯箱放大 + 本地发布/删除
-// 发布、删除仅在本地环境（localhost / 127.0.0.1 / file 协议）可用，线上访客看不到也无法调用
+// 日常（原照片墙）：数据渲染（data.json）+ 灯箱放大 + 本地发布/编辑/删除
+// 发布、编辑、删除仅在本地环境（localhost / 127.0.0.1 / file 协议）可用，线上访客看不到也无法调用
 (function () {
     if (window.__galleryInit) { return; }
     window.__galleryInit = true;
 
     var PUBLISH_API = 'http://127.0.0.1:4801/api/publish';
     var DELETE_API = 'http://127.0.0.1:4801/api/delete';
+    var UPDATE_API = 'http://127.0.0.1:4801/api/update';
 
-    // 是否本地环境（只有站主本机才有发布/删除功能）
+    // 是否本地环境（只有站主本机才有发布/编辑/删除功能）
     function isLocal() {
         var h = location.hostname;
         return h === 'localhost' || h === '127.0.0.1' || h === '' || location.protocol === 'file:';
@@ -44,19 +45,23 @@
         return msg;
     }
 
-    // 删除按钮（仅本地渲染进 DOM）
-    function delHtml(entry, idx) {
+    // 编辑 + 删除按钮（仅本地渲染进 DOM）
+    function actionsHtml(entry, idx) {
         if (!isLocal()) { return ''; }
-        return '<button class="gallery-del" type="button" title="删除这条动态"' +
-            ' data-id="' + escapeHtml(entry.id || '') + '"' +
+        var attrs = ' data-id="' + escapeHtml(entry.id || '') + '"' +
             ' data-index="' + idx + '"' +
-            ' data-date="' + escapeHtml(entry.date || '') + '">' +
-            '<i class="fas fa-trash-alt"></i></button>';
+            ' data-date="' + escapeHtml(entry.date || '') + '"';
+        return '<span class="gallery-actions">' +
+            '<button class="gallery-edit" type="button" title="编辑文字"' + attrs +
+            ' data-text="' + encodeURIComponent(entry.text || '') + '"><i class="fas fa-pen"></i></button>' +
+            '<button class="gallery-del" type="button" title="删除这条动态"' + attrs +
+            '><i class="fas fa-trash-alt"></i></button>' +
+            '</span>';
     }
 
     function dateRowHtml(entry, idx) {
         var dateLine = escapeHtml(entry.date || '') + (entry.time ? ' ' + escapeHtml(entry.time) : '');
-        return '<div class="gallery-date-row"><span class="gallery-date">' + dateLine + '</span>' + delHtml(entry, idx) + '</div>';
+        return '<div class="gallery-date-row"><span class="gallery-date">' + dateLine + '</span>' + actionsHtml(entry, idx) + '</div>';
     }
 
     // ---------- 渲染 ----------
@@ -208,31 +213,93 @@
         var zone = document.getElementById('gallery-upload-zone');
         var submit = document.getElementById('gallery-panel-submit');
         var textInput = document.getElementById('gallery-text-input');
+        var titleEl = document.getElementById('gallery-panel-title');
+        var tipEl = document.getElementById('gallery-panel-tip');
         var picked = [];
         var submitting = false;
+        var editing = null;   // { id, index, date } 编辑模式；null = 发布模式
+
+        function clearPicked() {
+            picked = [];
+            if (preview) { preview.innerHTML = ''; }
+            if (zone) { zone.classList.remove('has-files'); }
+            if (fileInput) { fileInput.value = ''; }
+        }
+
+        // 回到"发布模式"（面板状态复位）
+        function resetPanel() {
+            editing = null;
+            if (titleEl) { titleEl.textContent = '发布新动态'; }
+            if (tipEl) { tipEl.textContent = '自动压缩 webp + 更新页面'; }
+            if (zone) { zone.style.display = ''; }
+            if (textInput) { textInput.value = ''; }
+            if (submit) { submit.textContent = '发布'; }
+            clearPicked();
+        }
+
+        // 打开发布面板
+        function openPublishPanel() {
+            resetPanel();
+            if (panel) { panel.classList.add('open'); }
+            if (textInput) { textInput.focus(); }
+        }
+
+        // 打开编辑面板（仅改文字）
+        function openEdit(btn) {
+            resetPanel();
+            editing = {
+                id: btn.getAttribute('data-id') || '',
+                index: parseInt(btn.getAttribute('data-index'), 10),
+                date: btn.getAttribute('data-date') || ''
+            };
+            if (titleEl) { titleEl.textContent = '编辑动态'; }
+            if (tipEl) { tipEl.textContent = '编辑模式：仅修改文字（图片如需变动，请删除后重发）'; }
+            if (zone) { zone.style.display = 'none'; }
+            if (submit) { submit.textContent = '保存'; }
+            if (textInput) {
+                try { textInput.value = decodeURIComponent(btn.getAttribute('data-text') || ''); } catch (e) { textInput.value = ''; }
+                textInput.focus();
+            }
+            if (panel) { panel.classList.add('open'); }
+        }
 
         if (pubBtn && panel) {
-            pubBtn.addEventListener('click', function () { panel.classList.add('open'); });
+            pubBtn.addEventListener('click', openPublishPanel);
         }
         if (closeBtn && panel) {
-            closeBtn.addEventListener('click', function () { panel.classList.remove('open'); });
+            closeBtn.addEventListener('click', function () {
+                panel.classList.remove('open');
+                resetPanel();
+            });
         }
         if (panel) {
             panel.addEventListener('click', function (e) {
-                if (e.target === panel) { panel.classList.remove('open'); }
+                if (e.target === panel) {
+                    panel.classList.remove('open');
+                    resetPanel();
+                }
             });
         }
 
-        // 删除按钮：事件委托（内容动态渲染，委托一次即可，PJAX 换元素后重绑）
+        // 编辑 / 删除按钮：事件委托（内容动态渲染，委托一次即可）
         var feed = document.getElementById('gallery-feed');
         if (feed && !feed.dataset.delBound) {
             feed.dataset.delBound = '1';
             feed.addEventListener('click', function (e) {
-                var btn = e.target && e.target.closest ? e.target.closest('.gallery-del') : null;
-                if (btn) {
+                var t = e.target;
+                if (!t || !t.closest) { return; }
+                var editBtn = t.closest('.gallery-edit');
+                if (editBtn) {
                     e.preventDefault();
                     e.stopPropagation();
-                    deleteEntry(btn);
+                    openEdit(editBtn);
+                    return;
+                }
+                var delBtn = t.closest('.gallery-del');
+                if (delBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    deleteEntry(delBtn);
                 }
             });
         }
@@ -259,12 +326,45 @@
             });
         }
 
-        // 发布
+        // 提交（发布 or 保存编辑）
         if (submit) {
             submit.addEventListener('click', function () {
                 if (!isLocal()) { return; }
                 if (submitting) { return; }
                 var text = textInput ? textInput.value.trim() : '';
+
+                // ===== 编辑模式：只改文字 =====
+                if (editing) {
+                    submitting = true;
+                    submit.disabled = true;
+                    submit.textContent = '保存中…';
+                    fetch(UPDATE_API, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: editing.id, index: isNaN(editing.index) ? undefined : editing.index, date: editing.date, text: text })
+                    })
+                        .then(function (r) { return r.json(); })
+                        .then(function (res) {
+                            if (res && res.ok) {
+                                panel.classList.remove('open');
+                                resetPanel();
+                                toast('已保存' + (res.committed ? '（已提交 git）' : ''), true);
+                                return loadFeed();
+                            }
+                            throw new Error((res && res.error) || '保存失败');
+                        })
+                        .catch(function (e) {
+                            toast('保存失败：' + netErrorMessage(e), false);
+                        })
+                        .then(function () {
+                            submitting = false;
+                            submit.disabled = false;
+                            submit.textContent = '保存';
+                        });
+                    return;
+                }
+
+                // ===== 发布模式 =====
                 if (!picked.length && !text) {
                     toast('先选张图片或写点什么吧', false);
                     return;
@@ -288,11 +388,7 @@
                     .then(function (res) {
                         if (res && res.ok) {
                             panel.classList.remove('open');
-                            picked = [];
-                            preview.innerHTML = '';
-                            zone.classList.remove('has-files');
-                            if (fileInput) { fileInput.value = ''; }
-                            if (textInput) { textInput.value = ''; }
+                            resetPanel();
                             toast('发布成功！' + (res.committed ? ' 已自动提交 git' : ''), true);
                             return loadFeed();
                         }
@@ -309,7 +405,7 @@
             });
         }
 
-        // 加载照片墙内容
+        // 加载内容
         loadFeed();
     }
 

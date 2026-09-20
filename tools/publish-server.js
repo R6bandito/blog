@@ -141,6 +141,29 @@ function handleDelete(body) {
     return { deleted: entry, files: removed, committed: g.committed, commitMsg: g.msg };
 }
 
+// ---------- 编辑（仅文字） ----------
+function handleUpdate(body) {
+    const data = readData();
+    let idx = -1;
+    if (body.id) {
+        idx = data.findIndex(function (e) { return e && e.id === body.id; });
+    }
+    if (idx < 0 && typeof body.index === 'number' && body.index >= 0 && body.index < data.length) {
+        const e = data[body.index];
+        if (!body.date || e.date === body.date) { idx = body.index; }
+    }
+    if (idx < 0) { throw new Error('找不到这条动态（可能已被删除，刷新页面重试）'); }
+
+    const entry = data[idx];
+    const oldText = entry.text || '';
+    entry.text = (body.text || '').trim();
+    writeData(data);
+
+    const g = gitCommit('日常：编辑一条动态的文字');
+    log('已更新动态文字（' + oldText.length + ' 字 → ' + entry.text.length + ' 字）');
+    return { entry: entry, committed: g.committed, commitMsg: g.msg };
+}
+
 // ---------- HTTP ----------
 const server = http.createServer(function (req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -199,12 +222,25 @@ const server = http.createServer(function (req, res) {
         });
     }
 
+    if (req.method === 'POST' && req.url === '/api/update') {
+        return readBody(function (err, body) {
+            if (err) { return send(400, { ok: false, error: err.message }); }
+            try {
+                const r = handleUpdate(body);
+                send(200, { ok: true, committed: r.committed, commitMsg: r.commitMsg });
+            } catch (e) {
+                log('编辑失败: ' + e.message);
+                send(500, { ok: false, error: e.message });
+            }
+        });
+    }
+
     send(404, { ok: false, error: '未知接口' });
 });
 
 server.listen(PORT, '127.0.0.1', function () {
     log('照片墙本地发布服务已启动: http://127.0.0.1:' + PORT);
-    log('支持: 发布（压缩 webp，不加水印）/ 删除（清数据 + 清图片 + git 提交）');
+    log('支持: 发布（压缩 webp）/ 编辑（改文字）/ 删除（清数据 + 清图片），均自动 git 提交');
     log('（本服务仅本机可访问；关闭此窗口即停止）');
 });
 server.on('error', function (e) {
