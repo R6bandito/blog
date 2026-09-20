@@ -576,8 +576,12 @@ html.dark-mode .navbar-link {
     color: #c9ccd4;
 }
 html.dark-mode .navbar a.navbar-item:hover,
+html.dark-mode .navbar a.navbar-item:focus,
+html.dark-mode .navbar a.navbar-item:active,
 html.dark-mode .navbar a.navbar-item.is-active,
 html.dark-mode .navbar .navbar-link:hover,
+html.dark-mode .navbar .navbar-link:focus,
+html.dark-mode .navbar .navbar-link:active,
 html.dark-mode .navbar .navbar-link.is-active {
     background-color: rgba(255, 154, 203, 0.12) !important;
     color: #ff9acb;
