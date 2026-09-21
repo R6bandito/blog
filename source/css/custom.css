@@ -955,3 +955,57 @@ html.dark-mode .nav-site-title {
 html.dark-mode #site-days b {
     color: #ff9acb;
 }
+
+/* ==================== 个人卡片 · 头像区（圆形 + 动态渐变描边 + 呼吸光晕） ==================== */
+/* 可调参数：描边宽度 padding / 转速 4s / 渐变色 / 呼吸周期 3.2s */
+.widget[data-type="profile"] figure.image {
+    overflow: visible;   /* 允许悬停放大时轻微超出容器 */
+}
+
+/* @property 让"角度"变成可动画的变量（渐变绕边旋转的关键） */
+@property --avatar-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+/* 贴边细描边：img 的 padding 区域即描边，圆形裁剪 */
+.widget[data-type="profile"] img.avatar {
+    padding: 3px;                                    /* 描边宽度（要更细可改 2px） */
+    border-radius: 50%;                              /* 圆形 */
+    background: conic-gradient(from var(--avatar-angle),
+        #ffb3d4, #ff6fb3, #b78bfa, #ffb3d4);         /* 首尾同色，旋转无缝 */
+    box-shadow: 0 0 10px rgba(255, 111, 179, 0.20);  /* 呼吸光晕基础值（已调柔和） */
+    animation:
+        avatar-spin 4s linear infinite,              /* 渐变绕边旋转 */
+        avatar-breathe 3.2s ease-in-out infinite;    /* 呼吸光晕 */
+    transition: transform 0.35s ease;
+}
+
+/* 渐变的旋转（角度变量 0→360） */
+@keyframes avatar-spin {
+    to { --avatar-angle: 360deg; }
+}
+
+/* 呼吸光晕（白天） */
+@keyframes avatar-breathe {
+    0%, 100% { box-shadow: 0 0 8px rgba(255, 111, 179, 0.16); }
+    50%      { box-shadow: 0 0 18px rgba(255, 111, 179, 0.40); }
+}
+
+/* 悬停：轻微放大 + 一点点旋转 */
+.widget[data-type="profile"] img.avatar:hover {
+    transform: scale(1.05) rotate(-2deg);
+}
+
+/* 夜间：光晕更明显（暗背景上粉色更亮） */
+html.dark-mode .widget[data-type="profile"] img.avatar {
+    animation-name: avatar-spin, avatar-breathe-dark;
+}
+
+@keyframes avatar-breathe-dark {
+    0%, 100% { box-shadow: 0 0 10px rgba(255, 154, 203, 0.24); }
+    50%      { box-shadow: 0 0 20px rgba(255, 154, 203, 0.52); }
+}
+
+/* 注：与站点其他动效（花瓣/雨丝）策略一致——不跟随系统的"减少动效"偏好 */
