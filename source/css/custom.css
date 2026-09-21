@@ -1009,3 +1009,109 @@ html.dark-mode .widget[data-type="profile"] img.avatar {
 }
 
 /* 注：与站点其他动效（花瓣/雨丝）策略一致——不跟随系统的"减少动效"偏好 */
+
+/* ==================== 个人卡片 · 收尾（玻璃感/樱花/在线点/按钮） ==================== */
+/* 1. 半透明玻璃感 + 悬停浮起 */
+.widget[data-type="profile"] {
+    position: relative;
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(10px) saturate(1.15);
+    -webkit-backdrop-filter: blur(10px) saturate(1.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.widget[data-type="profile"]:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(224, 86, 138, 0.18);
+}
+
+html.dark-mode .widget[data-type="profile"] {
+    background: rgba(24, 27, 35, 0.55);
+}
+
+/* 2. 角落樱花（右上角，低透明度） */
+.widget[data-type="profile"]::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23ff9acb'%3E%3Cellipse cx='50' cy='28' rx='12' ry='21'/%3E%3Cellipse cx='50' cy='28' rx='12' ry='21' transform='rotate(72 50 54)'/%3E%3Cellipse cx='50' cy='28' rx='12' ry='21' transform='rotate(144 50 54)'/%3E%3Cellipse cx='50' cy='28' rx='12' ry='21' transform='rotate(216 50 54)'/%3E%3Cellipse cx='50' cy='28' rx='12' ry='21' transform='rotate(288 50 54)'/%3E%3C/g%3E%3Ccircle cx='50' cy='54' r='8' fill='%23fff2f9'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+html.dark-mode .widget[data-type="profile"]::before {
+    opacity: 0.3;
+}
+
+/* 3. "在线"呼吸小圆点（站名后） */
+.widget[data-type="profile"] .title.is-size-4::after {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-left: 8px;
+    vertical-align: middle;
+    border-radius: 50%;
+    background: #66bb6a;
+    animation: profile-online 2.2s ease-out infinite;
+}
+
+@keyframes profile-online {
+    0% { box-shadow: 0 0 0 0 rgba(102, 187, 106, 0.55); }
+    70%, 100% { box-shadow: 0 0 0 6px rgba(102, 187, 106, 0); }
+}
+
+/* 4a. "关注我"按钮：粉渐变（全时段统一） */
+.widget[data-type="profile"] .button.is-primary {
+    background: linear-gradient(135deg, #ff9acb, #ff6fb3) !important;
+    border-color: transparent !important;
+    color: #fff !important;
+    box-shadow: 0 3px 12px rgba(255, 111, 179, 0.30);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.widget[data-type="profile"] .button.is-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 16px rgba(255, 111, 179, 0.42);
+}
+
+/* 社交图标行居中（is-multiline 是社交行独有的组合） */
+.widget[data-type="profile"] .level.is-mobile.is-multiline {
+    justify-content: center;
+}
+
+/* 4b. 社交图标：圆形浅底托 + 悬停上浮变粉 */
+.widget[data-type="profile"] .level-item.button.is-transparent {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 38px;          /* 防止被 level 的 flex-grow 拉伸 */
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 154, 203, 0.10);
+    color: #b08a9c;
+    margin: 0 4px;
+    transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.widget[data-type="profile"] .level-item.button.is-transparent:hover {
+    background: rgba(255, 154, 203, 0.22);
+    color: #e0568a;
+    transform: translateY(-2px);
+}
+
+html.dark-mode .widget[data-type="profile"] .level-item.button.is-transparent {
+    background: rgba(255, 154, 203, 0.08);
+    color: #9aa0ab;
+}
+
+html.dark-mode .widget[data-type="profile"] .level-item.button.is-transparent:hover {
+    background: rgba(255, 154, 203, 0.20);
+    color: #ff9acb;
+}
