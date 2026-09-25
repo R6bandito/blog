@@ -80,3 +80,9 @@ hexo.extend.injector.register('body_end', '<script src="/js/gallery.js" defer></
 
 // 页脚：本站已运行天数
 hexo.extend.injector.register('body_end', '<script src="/js/site-days.js" defer></script>');
+
+// 文章分享条：样式 + 二维码库（本地化）+ 交互脚本
+// qrcode.min.js 必须排在 share.js 之前（defer 按顺序执行）
+hexo.extend.injector.register('head_end', '<link rel="stylesheet" href="/css/share.css">');
+hexo.extend.injector.register('body_end', '<script src="/js/vendor/qrcode.min.js"></script>');
+hexo.extend.injector.register('body_end', '<script src="/js/share.js" defer></script>');
