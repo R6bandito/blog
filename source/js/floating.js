@@ -1,6 +1,7 @@
 // 页面微装饰：樱花飘落 + 点击礼花 + 背景微光点 + 夜间雨丝
 // 设计原则：轻量（单 rAF 循环驱动多个 Canvas）、克制、不干扰正文
 // 参数集中在下方 CONFIG，可随时调整
+// 主题过渡：白天/夜间切换时不做任何"重建"，alpha 与数量都平滑过渡（花瓣不重置）
 (function () {
     if (window.__floatingInit) { return; }
     window.__floatingInit = true;
@@ -16,6 +17,11 @@
         countPerWidth: 120,
         countMax: 14,
         nightPetalFactor: 0.6,            // 夜间：花瓣数量乘以该系数（更少）
+        // 主题过渡速度（每帧逼近系数，越小越慢越柔和）
+        themeLerp: 0.05,                  // 花瓣透明度过渡
+        rainLerp: 0.045,                  // 雨丝渐入渐出
+        petalSpawnStep: 0.25,             // 补花瓣的速度（约每 4 帧一片）
+        petalFadeStep: 0.010,             // 减花瓣的淡出速度
         // 点击礼花
         confettiCount: 12,
         confettiColors: ['#ff6fb3', '#ffa726', '#26c6da', '#66bb6a', '#ab47bc', '#ffca28', '#ef5350', '#ff8a65'],
@@ -74,6 +80,7 @@
     function makePetal(fromTop) {
         var dark = isDark();
         var range = dark ? CONFIG.petalAlphaDark : CONFIG.petalAlpha;
+        var ratio = Math.random();          // 在 alpha 区间内的相对位置（供主题过渡插值）
         return {
             x: Math.random() * innerWidth,
             y: fromTop ? -20 - Math.random() * 80 : Math.random() * innerHeight,
@@ -83,18 +90,48 @@
             phase: Math.random() * Math.PI * 2,
             rot: Math.random() * Math.PI * 2,
             vr: (Math.random() - 0.5) * 0.02,
-            alpha: range[0] + Math.random() * (range[1] - range[0]),
+            alphaRatio: ratio,
+            alpha: range[0] + ratio * (range[1] - range[0]),
+            dying: false,
             color: CONFIG.petalColors[Math.floor(Math.random() * CONFIG.petalColors.length)]
         };
     }
-    function resetPetals() {
-        if (reduceMotion) { petals = []; return; }
+
+    // 目标花瓣数（随主题与窗口宽度变化）
+    function targetPetalCount() {
         var n = Math.max(6, Math.min(CONFIG.countMax, Math.floor(innerWidth / CONFIG.countPerWidth)));
         if (isDark()) { n = Math.max(4, Math.round(n * CONFIG.nightPetalFactor)); }
+        return n;
+    }
+
+    function resetPetals() {
+        if (reduceMotion) { petals = []; return; }
+        var n = targetPetalCount();
         petals = [];
         for (var i = 0; i < n; i++) petals.push(makePetal(false));
     }
     resetPetals();
+
+    // 数量平滑收敛：不足时从顶部慢慢补，超出时让最靠下的花瓣淡出（不重置任何已有花瓣）
+    var petalSpawnCarry = 0;
+    function syncPetals() {
+        if (reduceMotion) { return; }
+        var target = targetPetalCount();
+        if (petals.length < target) {
+            petalSpawnCarry += CONFIG.petalSpawnStep;
+            while (petalSpawnCarry >= 1 && petals.length < target) {
+                petals.push(makePetal(true));
+                petalSpawnCarry -= 1;
+            }
+        } else if (petals.length > target) {
+            var idx = -1, maxY = -1;
+            for (var i = 0; i < petals.length; i++) {
+                var q = petals[i];
+                if (!q.dying && q.y > maxY) { maxY = q.y; idx = i; }
+            }
+            if (idx >= 0) { petals[idx].dying = true; }   // 主循环里淡出后移除
+        }
+    }
 
     function drawPetal(p) {
         ctx.save();
@@ -110,16 +147,6 @@
         ctx.fill();
         ctx.restore();
     }
-
-    // 主题切换时重建花瓣（应用/退出夜间参数）
-    try {
-        var mo = new MutationObserver(function (muts) {
-            for (var i = 0; i < muts.length; i++) {
-                if (muts[i].attributeName === 'class') { resetPetals(); break; }
-            }
-        });
-        mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    } catch (e) {}
 
     // ---------- 点击礼花 ----------
     var confetti = [];
@@ -167,28 +194,78 @@
     }
     resetStreaks();
 
+    // 进入夜间：雨丝回到屏幕上方，自然"开始下雨"（不重建数组）
+    function resetStreakPositions() {
+        for (var i = 0; i < streaks.length; i++) {
+            streaks[i].y = -30 - Math.random() * innerHeight;
+            streaks[i].x = Math.random() * (innerWidth + 160) - 80;
+        }
+    }
+
     var t = 0, raf = null, hidden = false;
     var rainCleared = true;
+    // 主题过渡系数：0 = 白天，1 = 夜间（逐帧逼近，切换不跳变）
+    var darkLevel = isDark() ? 1 : 0;
+    var rainLevel = darkLevel;
     document.addEventListener('visibilitychange', function () {
         hidden = document.hidden;
         if (!hidden && !raf) { raf = requestAnimationFrame(loop); }
     });
+
+    // 主题切换：花瓣不重建（主循环里做平滑过渡）；仅在进入夜间时把雨丝归位
+    try {
+        var mo = new MutationObserver(function (muts) {
+            for (var i = 0; i < muts.length; i++) {
+                if (muts[i].attributeName === 'class') {
+                    if (isDark()) { resetStreakPositions(); }
+                    break;
+                }
+            }
+        });
+        mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    } catch (e) {}
 
     function loop() {
         raf = null;
         if (hidden) { return; }
 
         t += 0.016;
+
+        // 主题过渡逼近（花瓣透明度 / 雨丝显隐都跟着它走）
+        var darkTarget = isDark() ? 1 : 0;
+        darkLevel += (darkTarget - darkLevel) * CONFIG.themeLerp;
+        if (Math.abs(darkTarget - darkLevel) < 0.002) { darkLevel = darkTarget; }
+        rainLevel += (darkTarget - rainLevel) * CONFIG.rainLerp;
+        if (Math.abs(darkTarget - rainLevel) < 0.002) { rainLevel = darkTarget; }
+
+        // 花瓣数量平滑收敛（补/减都不改变已有花瓣的位置）
+        syncPetals();
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         bCtx.clearRect(0, 0, bCanvas.width, bCanvas.height);
+
+        // 花瓣 alpha 区间随主题过渡插值
+        var a0 = CONFIG.petalAlpha[0] + (CONFIG.petalAlphaDark[0] - CONFIG.petalAlpha[0]) * darkLevel;
+        var a1 = CONFIG.petalAlpha[1] + (CONFIG.petalAlphaDark[1] - CONFIG.petalAlpha[1]) * darkLevel;
 
         // 花瓣：下落 + 摇摆 + 自转
         for (var i = 0; i < petals.length; i++) {
             var p = petals[i];
+            if (p.dying) {
+                p.alpha -= CONFIG.petalFadeStep;                 // 减量：淡出后移除
+                if (p.alpha <= 0.006) { petals.splice(i, 1); i--; continue; }
+            } else {
+                p.alpha = a0 + p.alphaRatio * (a1 - a0);         // 随主题平滑变化
+            }
             p.y += p.vy;
             p.x += Math.sin(t * p.sway + p.phase) * 0.6;
             p.rot += p.vr;
-            if (p.y > innerHeight + 30) { petals[i] = makePetal(true); continue; }
+            if (p.y > innerHeight + 30) {
+                // 落底：需要减量时不再重生，否则从顶部重新飘入
+                if (petals.length > targetPetalCount()) { petals.splice(i, 1); i--; continue; }
+                petals[i] = makePetal(true);
+                continue;
+            }
             drawPetal(p);
         }
 
@@ -207,8 +284,8 @@
             bCtx.restore();
         }
 
-        // ---------- 夜间雨丝（仅暗色模式） ----------
-        if (isDark()) {
+        // ---------- 夜间雨丝（随 rainLevel 渐入渐出） ----------
+        if (rainLevel > 0.004) {
             rainCleared = false;
             rCtx.clearRect(0, 0, rCanvas.width, rCanvas.height);
             rCtx.lineWidth = 1;
@@ -218,7 +295,7 @@
                 st.x += st.vx;
                 if (st.y > innerHeight + 30 || st.x > innerWidth + 30) { streaks[s] = makeStreak(true); continue; }
                 rCtx.save();
-                rCtx.globalAlpha = st.alpha;
+                rCtx.globalAlpha = st.alpha * rainLevel;
                 rCtx.strokeStyle = '#cfe0f5';
                 rCtx.beginPath();
                 rCtx.moveTo(st.x, st.y);
