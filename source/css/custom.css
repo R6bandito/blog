@@ -188,7 +188,6 @@ figure.highlight::-webkit-scrollbar-track {
         padding: 0.4rem 1rem;      /* 常驻底部，进一步压缩高度 */
     }
 }
-}
 
 /* 分类/标签列表页：只显示文章标题，隐藏正文 */
 body.is-list-page .article .content,
@@ -330,7 +329,7 @@ h1, h2, h3, h4, h5, h6 {
 .article .content table th {
     background: rgba(255, 154, 203, 0.12);
 }
-.article .content table tr:hover {
+.article .content table:not(figure.highlight table) tr:hover {
     background: rgba(255, 154, 203, 0.06);
 }
 
@@ -615,7 +614,7 @@ html.dark-mode .article .content table td {
     border-color: rgba(255, 255, 255, 0.1);
     color: #c9ccd4;
 }
-html.dark-mode .article .content table tr:hover {
+html.dark-mode .article .content table:not(figure.highlight table) tr:hover {
     background: rgba(255, 154, 203, 0.05);
 }
 /* 背景柔化遮罩：夜间改为"压暗"（不再是白色柔化） */
@@ -1114,4 +1113,107 @@ html.dark-mode .widget[data-type="profile"] .level-item.button.is-transparent {
 html.dark-mode .widget[data-type="profile"] .level-item.button.is-transparent:hover {
     background: rgba(255, 154, 203, 0.20);
     color: #ff9acb;
+}
+
+/* ==================== 代码块 · 玻璃极简（方案 C） ==================== */
+/* 说明：写在方案 A 之后，同名属性以后者为准（便于 A/C 切换与回退） */
+figure.highlight {
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: 0 12px 34px rgba(30, 34, 42, 0.32);
+    background: #282c34;
+    overflow-x: auto;
+}
+
+/* 顶部条：完全融入深色（无背景、无分割线） */
+figure.highlight figcaption,
+figure.highlight figcaption.level {
+    background: transparent !important;
+    border-bottom: none;
+    color: #8b93a5;
+    padding: 7px 14px 1px;
+    min-height: 28px;
+    align-items: center;
+}
+
+/* 语言标签：透明底 + 灰描边（把 A 的粉色胶囊换成描边款） */
+figure.highlight[class] figcaption::before {
+    padding: 1px 8px;
+    border-radius: 20px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #9aa3b5;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+    line-height: 1.6;
+    margin-right: 8px;
+    flex: 0 0 auto;
+}
+
+/* 语言名 → 标签文字映射 */
+figure.highlight.c figcaption::before { content: "C"; }
+figure.highlight.cpp figcaption::before, figure.highlight.c\+\+ figcaption::before { content: "C++"; }
+figure.highlight.csharp figcaption::before, figure.highlight.cs figcaption::before { content: "C#"; }
+figure.highlight.java figcaption::before { content: "Java"; }
+figure.highlight.python figcaption::before, figure.highlight.py figcaption::before { content: "Python"; }
+figure.highlight.javascript figcaption::before, figure.highlight.js figcaption::before { content: "JavaScript"; }
+figure.highlight.typescript figcaption::before, figure.highlight.ts figcaption::before { content: "TypeScript"; }
+figure.highlight.bash figcaption::before, figure.highlight.shell figcaption::before, figure.highlight.sh figcaption::before { content: "Bash"; }
+figure.highlight.html figcaption::before { content: "HTML"; }
+figure.highlight.xml figcaption::before { content: "XML"; }
+figure.highlight.css figcaption::before { content: "CSS"; }
+figure.highlight.json figcaption::before { content: "JSON"; }
+figure.highlight.yaml figcaption::before, figure.highlight.yml figcaption::before { content: "YAML"; }
+figure.highlight.ini figcaption::before { content: "INI"; }
+figure.highlight.makefile figcaption::before { content: "Makefile"; }
+figure.highlight.cmake figcaption::before { content: "CMake"; }
+figure.highlight.diff figcaption::before { content: "Diff"; }
+figure.highlight.sql figcaption::before { content: "SQL"; }
+figure.highlight.powershell figcaption::before, figure.highlight.ps1 figcaption::before { content: "PowerShell"; }
+figure.highlight.bat figcaption::before, figure.highlight.batch figcaption::before { content: "Batch"; }
+
+/* 折叠箭头 + 复制按钮：灰色系，hover 泛白 */
+figure.highlight figcaption .fold,
+figure.highlight figcaption .copy {
+    color: #8b93a5;
+    opacity: 0.8;
+    padding: 4px 8px;
+    border-radius: 7px;
+    transition: color 0.18s ease, background 0.18s ease, opacity 0.18s ease;
+    cursor: pointer;
+}
+figure.highlight figcaption .fold:hover,
+figure.highlight figcaption .copy:hover {
+    color: #e8ecf4;
+    background: rgba(255, 255, 255, 0.08);
+    opacity: 1;
+}
+
+/* 行号列：无底、无分割线、行号更暗 */
+figure.highlight .gutter {
+    background: transparent !important;
+    border-right: none;
+    color: #454b5c !important;
+    padding: 14px 10px 14px 16px !important;
+    user-select: none;
+    -webkit-user-select: none;
+}
+figure.highlight .gutter .line {
+    color: #454b5c;
+}
+
+/* 代码列：内边距略大 */
+figure.highlight .code {
+    padding: 14px 18px !important;
+}
+figure.highlight .code pre,
+figure.highlight .gutter pre {
+    padding: 0 !important;
+}
+
+/* 兜底：代码块内部表格（行号/代码两列）不参与任何悬停底色 */
+figure.highlight table tr:hover,
+figure.highlight table tr:hover td {
+    background: transparent !important;
 }
