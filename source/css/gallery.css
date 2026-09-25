@@ -518,3 +518,75 @@ html.dark-mode .gallery-edit:hover {
     color: #ff9acb;
     background: rgba(255, 154, 203, 0.12);
 }
+
+/* ==================== 长文布局（方案 A）：图片在上、文字在下 ==================== */
+.gallery-feature.is-long {
+    flex-direction: column;
+    gap: 14px;
+}
+
+.gallery-feature.is-long .gallery-feature-image {
+    flex: 1 1 auto;
+    max-width: 100%;
+}
+
+.gallery-feature.is-long .gallery-feature-text {
+    width: 100%;
+}
+
+/* ==================== 长文折叠（方案 B）：约 10 行 + 渐隐 + 展开按钮 ==================== */
+.gallery-text.is-folded {
+    /* --fold-lines 由 JS 注入（默认 10） */
+    max-height: calc(var(--fold-lines, 10) * 1.85em);
+    overflow: hidden;
+    position: relative;
+}
+
+.gallery-text.is-folded::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3.6em;
+    background: linear-gradient(rgba(255, 255, 255, 0), #ffffff 85%);
+    pointer-events: none;
+}
+
+html.dark-mode .gallery-text.is-folded::after {
+    background: linear-gradient(rgba(26, 29, 36, 0), #1a1d24 85%);
+}
+
+/* 展开 / 收起按钮 */
+.gallery-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 9px;
+    padding: 5px 14px;
+    border: 1px solid rgba(255, 154, 203, 0.35);
+    border-radius: 20px;
+    background: rgba(255, 154, 203, 0.08);
+    color: #e0568a;
+    font-size: 12.5px;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.gallery-more:hover {
+    background: linear-gradient(135deg, #ff9acb, #ff6fb3);
+    color: #fff;
+    border-color: transparent;
+    transform: translateY(-1px);
+}
+
+.gallery-more i {
+    font-size: 11px;
+}
+
+html.dark-mode .gallery-more {
+    color: #ff9acb;
+    border-color: rgba(255, 154, 203, 0.28);
+    background: rgba(255, 154, 203, 0.10);
+}

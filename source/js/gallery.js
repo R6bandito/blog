@@ -64,6 +64,23 @@
         return '<div class="gallery-date-row"><span class="gallery-date">' + dateLine + '</span>' + actionsHtml(entry, idx) + '</div>';
     }
 
+    // ---------- 文字块（长文折叠 A+B） ----------
+    var LONG_TEXT = 150;   // 超过此字数：第一条改用"图在上、文字在下"的上下布局
+    var FOLD_TEXT = 400;   // 超过此字数：默认折叠约 10 行，点"展开全文"查看
+    var FOLD_LINES = 10;
+
+    function textBlockHtml(entry) {
+        var text = entry.text || '';
+        if (!text) { return ''; }
+        var folded = text.length > FOLD_TEXT;
+        return '<div class="gallery-text' + (folded ? ' is-folded' : '') + '" style="--fold-lines:' + FOLD_LINES + '">' + escapeHtml(text) + '</div>' +
+            (folded ? '<button type="button" class="gallery-more"><span>展开全文</span><i class="fas fa-angle-down"></i></button>' : '');
+    }
+
+    function isLongText(entry) {
+        return (entry.text || '').length > LONG_TEXT;
+    }
+
     // ---------- 渲染 ----------
     function buildGrid(imgs) {
         var g = document.createElement('div');
@@ -111,8 +128,8 @@
                 fi.appendChild(fim);
                 var ft = document.createElement('div');
                 ft.className = 'gallery-feature-text';
-                ft.innerHTML = dateRowHtml(entry, idx) +
-                    (entry.text ? '<div class="gallery-text">' + escapeHtml(entry.text) + '</div>' : '');
+                ft.innerHTML = dateRowHtml(entry, idx) + textBlockHtml(entry);
+                if (isLongText(entry)) { f.className = 'gallery-feature is-long'; }
                 f.appendChild(fi);
                 f.appendChild(ft);
                 feed.appendChild(f);
@@ -121,8 +138,7 @@
                 // 其他条目：日期 + 文字 + 九宫格
                 var card = document.createElement('div');
                 card.className = 'gallery-entry';
-                card.innerHTML = dateRowHtml(entry, idx) +
-                    (entry.text ? '<div class="gallery-text">' + escapeHtml(entry.text) + '</div>' : '');
+                card.innerHTML = dateRowHtml(entry, idx) + textBlockHtml(entry);
                 if (imgs.length) { card.appendChild(buildGrid(imgs)); }
                 feed.appendChild(card);
             }
@@ -298,6 +314,21 @@
                     e.preventDefault();
                     e.stopPropagation();
                     openEdit(editBtn);
+                    return;
+                }
+                var moreBtn = t.closest('.gallery-more');
+                if (moreBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var txt = moreBtn.previousElementSibling;
+                    if (txt && txt.classList.contains('gallery-text')) {
+                        var nowFolded = txt.classList.toggle('is-folded');
+                        var label = moreBtn.querySelector('span');
+                        var icon = moreBtn.querySelector('i');
+                        if (label) { label.textContent = nowFolded ? '展开全文' : '收起'; }
+                        if (icon) { icon.className = nowFolded ? 'fas fa-angle-down' : 'fas fa-angle-up'; }
+                        if (nowFolded) { try { txt.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (err) {} }
+                    }
                     return;
                 }
                 var delBtn = t.closest('.gallery-del');
