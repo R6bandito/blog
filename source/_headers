@@ -4,3 +4,31 @@
 # 浏览器打开会渲染漂亮的订阅页；RSS 阅读器不受影响（都接受 application/xml）
 /atom.xml
   Content-Type: application/xml
+
+
+# ===== 静态资源缓存策略 =====
+# 文件名不带 hash：CSS/JS 用短缓存（改动 1 小时内全网生效），图片 1 天，
+# 字体/音乐等几乎不变的资源长缓存。HTML 保持默认（不缓存），保证内容即时可见。
+/css/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/js/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/images/*
+  Cache-Control: public, max-age=86400
+
+/img/*
+  Cache-Control: public, max-age=86400
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/webfonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/music/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/gallery/uploads/*
+  Cache-Control: public, max-age=31536000, immutable
