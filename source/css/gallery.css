@@ -526,8 +526,12 @@ html.dark-mode .gallery-edit:hover {
 }
 
 .gallery-feature.is-long .gallery-feature-image {
-    flex: 1 1 auto;
+    /* 等比缩小：限制容器宽度（高度自动等比降低），居中显示
+       想再大/再小改下面的 68% 即可（或调 CSS 变量 --long-img-w） */
+    flex: 0 0 auto;
+    width: var(--long-img-w, 68%);
     max-width: 100%;
+    margin: 0 auto;
 }
 
 .gallery-feature.is-long .gallery-feature-text {
