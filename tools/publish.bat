@@ -8,7 +8,7 @@ echo   照片墙 · 本地发布服务
 echo  ============================================
 echo.
 echo   保持此窗口打开，然后在浏览器里打开：
-echo   http://localhost:4800/gallery/
+echo   http://localhost:50000/gallery/
 echo.
 echo   点「发布」→ 选图 + 写字 → 发布
 echo   （自动压缩、加水印、更新页面、提交 git）
