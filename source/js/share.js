@@ -89,10 +89,12 @@
     }
 
     function buildBar() {
-        var article = document.querySelector('article.card-content.article');
-        if (!article) { return; }
-        if (!article.querySelector('.content')) { return; }           // 非文章页
-        if (document.body.classList.contains('is-list-page')) { return; }
+        // 仅当页面上"恰好有一篇文章卡片"时才显示分享条：
+        // 0 篇 = 非文章页；多篇 = 分类/标签等列表页（目录），都不显示
+        var articles = document.querySelectorAll('article.card-content.article');
+        if (articles.length !== 1) { return; }
+        var article = articles[0];
+        if (!article.querySelector('.content')) { return; }
         if (article.querySelector('.share-bar')) { return; }          // 幂等
 
         var titleEl = article.querySelector('h1.title');
