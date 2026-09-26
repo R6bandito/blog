@@ -86,3 +86,9 @@ hexo.extend.injector.register('body_end', '<script src="/js/site-days.js" defer>
 hexo.extend.injector.register('head_end', '<link rel="stylesheet" href="/css/share.css">');
 hexo.extend.injector.register('body_end', '<script src="/js/vendor/qrcode.min.js"></script>');
 hexo.extend.injector.register('body_end', '<script src="/js/share.js" defer></script>');
+
+// 个人卡片 · 邮箱图标（地址用 JS 分片组装，页面源码不出现完整邮箱，防爬虫收集）
+hexo.extend.injector.register('body_end', `<script>(function () { function addMailIcon() { var box = document.querySelector('.widget[data-type="profile"] .level.is-mobile.is-multiline'); if (!box || box.querySelector('.profile-mail')) { return; } var u = ['youds1016', 'gmail.com']; var a = document.createElement('a'); a.className = 'level-item button is-transparent is-marginless profile-mail'; a.title = 'Email'; a.setAttribute('aria-label', '给我发邮件'); a.href = 'mailto:' + u[0] + '@' + u[1]; var i = document.createElement('i'); i.className = 'fas fa-envelope'; a.appendChild(i); box.appendChild(a); } addMailIcon(); document.addEventListener('pjax:complete', addMailIcon); })();</script>`);
+
+// 个人卡片 · 全站字数统计（纯展示，不可点击）
+hexo.extend.injector.register('body_end', '<script src="/js/site-words.js" defer></script>');

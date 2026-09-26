@@ -1217,3 +1217,9 @@ figure.highlight table tr:hover,
 figure.highlight table tr:hover td {
     background: transparent !important;
 }
+
+/* ==================== 个人卡片 · 社交图标之间的间距 ==================== */
+/* GitHub / 邮箱等图标拉开一些距离（原来 is-marginless 使它们紧贴） */
+.widget[data-type="profile"] .level.is-mobile.is-multiline {
+    gap: 12px;
+}

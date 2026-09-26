@@ -546,19 +546,40 @@ html.dark-mode .gallery-edit:hover {
     position: relative;
 }
 
+/* 渐隐：10 段平滑曲线（缓入缓出），避免分段处出现"折线感"（羽化） */
 .gallery-text.is-folded::after {
     content: '';
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
-    height: 3.6em;
-    background: linear-gradient(rgba(255, 255, 255, 0), #ffffff 85%);
+    height: 2.8em;
+    background: linear-gradient(to bottom,
+        rgba(255, 255, 255, 0.00) 0%,
+        rgba(255, 255, 255, 0.02) 12%,
+        rgba(255, 255, 255, 0.06) 24%,
+        rgba(255, 255, 255, 0.13) 36%,
+        rgba(255, 255, 255, 0.24) 48%,
+        rgba(255, 255, 255, 0.40) 60%,
+        rgba(255, 255, 255, 0.60) 70%,
+        rgba(255, 255, 255, 0.79) 80%,
+        rgba(255, 255, 255, 0.93) 88%,
+        #ffffff 96%);
     pointer-events: none;
 }
 
 html.dark-mode .gallery-text.is-folded::after {
-    background: linear-gradient(rgba(26, 29, 36, 0), #1a1d24 85%);
+    background: linear-gradient(to bottom,
+        rgba(26, 29, 36, 0.00) 0%,
+        rgba(26, 29, 36, 0.02) 12%,
+        rgba(26, 29, 36, 0.06) 24%,
+        rgba(26, 29, 36, 0.13) 36%,
+        rgba(26, 29, 36, 0.24) 48%,
+        rgba(26, 29, 36, 0.40) 60%,
+        rgba(26, 29, 36, 0.60) 70%,
+        rgba(26, 29, 36, 0.79) 80%,
+        rgba(26, 29, 36, 0.93) 88%,
+        #1a1d24 96%);
 }
 
 /* 展开 / 收起按钮 */

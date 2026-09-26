@@ -92,6 +92,7 @@
             var im = document.createElement('img');
             im.src = src;
             im.alt = '';
+            im.loading = 'lazy';
             c.appendChild(im);
             g.appendChild(c);
         });
@@ -124,7 +125,10 @@
                 fi.setAttribute('data-src', imgs[0]);   // 灯箱取图用
                 var fim = document.createElement('img');
                 fim.src = imgs[0];
-                fim.alt = '置顶照片';
+                // 视觉上不显示文字（避免图片未加载/悬停时"置顶照片"露出），无障碍描述用 aria-label 保留
+                fim.alt = '';
+                fim.setAttribute('aria-label', '置顶照片');
+                fim.loading = 'lazy';
                 fi.appendChild(fim);
                 var ft = document.createElement('div');
                 ft.className = 'gallery-feature-text';

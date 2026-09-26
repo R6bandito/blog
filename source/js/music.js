@@ -56,23 +56,77 @@
         saveState({ playing: false, time: audio.currentTime, idx: idx });
     }
 
+    // ===== 音量渐变（渐入/渐出，避免突然响起或骤停）=====
+    var FADE_IN_MS = 720;      // 渐入时长（更从容的渐入）
+    var FADE_OUT_MS = 520;     // 渐出时长（明显但不拖沓）
+    var TARGET_VOL = 1;        // 目标音量
+    var fadeTimer = null;
+
+    function clearFade() {
+        if (fadeTimer) { clearInterval(fadeTimer); fadeTimer = null; }
+    }
+    // 渐入：音量从 0 平滑升到目标（平方曲线，听感更自然）
+    function fadeIn() {
+        clearFade();
+        try { audio.volume = 0; } catch (e) {}
+        var steps = Math.max(8, Math.round(FADE_IN_MS / 25));
+        var cur = 0;
+        fadeTimer = setInterval(function () {
+            cur++;
+            var v = cur / steps;
+            try { audio.volume = Math.min(TARGET_VOL, TARGET_VOL * v * v * v); } catch (e) {}
+            if (cur >= steps) {
+                clearFade();
+                try { audio.volume = TARGET_VOL; } catch (e) {}
+            }
+        }, 25);
+    }
+    // 渐出：音量降到 0 后再执行回调（暂停/切歌）
+    function fadeOut(done) {
+        clearFade();
+        var start = 1;
+        try { start = audio.volume; } catch (e) {}
+        var steps = Math.max(6, Math.round(FADE_OUT_MS / 25));
+        var cur = 0;
+        fadeTimer = setInterval(function () {
+            cur++;
+            try { audio.volume = Math.max(0, start * (1 - cur / steps)); } catch (e) {}
+            if (cur >= steps) {
+                clearFade();
+                try { audio.volume = 0; } catch (e) {}
+                if (typeof done === 'function') { done(); }
+            }
+        }, 25);
+    }
+
     function load(i, showBar) {
         idx = (i + songs.length) % songs.length;
-        audio.src = songs[idx].url;
-        title.textContent = songs[idx].name;
-        if (showBar !== false) { bar.classList.add('show'); }
-        userPaused = false;
-        audio.play();
+        var doSwitch = function () {
+            audio.src = songs[idx].url;
+            title.textContent = songs[idx].name;
+            if (showBar !== false) { bar.classList.add('show'); }
+            userPaused = false;
+            audio.play();
+            fadeIn();
+        };
+        // 正在播放 → 先渐出再切歌；否则直接切
+        if (!audio.paused) { fadeOut(doSwitch); } else { clearFade(); doSwitch(); }
     }
 
     // 音符按钮：播放/暂停开关
     btn.addEventListener('click', function () {
         if (audio.paused) {
             if (!loaded) { loaded = true; load(0, true); }
-            else { userPaused = false; audio.play(); bar.classList.add('show'); }
+            else {
+                clearFade();                       // 取消可能还在进行的渐出
+                userPaused = false;
+                bar.classList.add('show');
+                audio.play();
+                fadeIn();
+            }
         } else {
             userPaused = true;
-            audio.pause();
+            fadeOut(function () { audio.pause(); });
         }
     });
 
@@ -83,8 +137,15 @@
 
     // 控制条内的播放/暂停
     playBtn.addEventListener('click', function () {
-        if (audio.paused) { userPaused = false; audio.play(); }
-        else { userPaused = true; audio.pause(); }
+        if (audio.paused) {
+            clearFade();
+            userPaused = false;
+            audio.play();
+            fadeIn();
+        } else {
+            userPaused = true;
+            fadeOut(function () { audio.pause(); });
+        }
     });
 
     prevBtn.addEventListener('click', function () { load(idx - 1, true); });
@@ -132,7 +193,7 @@
             if (st.time && audio.currentTime < st.time - 1) {
                 try { audio.currentTime = st.time; } catch (e) { /* ignore */ }
             }
-            audio.play().catch(function () { /* 被拦截则等用户点击 */ });
+            audio.play().then(function () { fadeIn(); }).catch(function () { /* 被拦截则等用户点击 */ });
         };
         if (audio.readyState >= 2) { resume(); }
         else {
